@@ -1,26 +1,42 @@
+import 'package:falavastr/complex_example.dart';
 import 'package:flutter/material.dart';
 import 'toolbar.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MainCollapsingToolbar(),
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Color(0xFFb97b50), //or set color with: Color(0xFF0000FF)
+    ));
+    return MaterialApp(
+      title: 'Алавастр2',
+      theme: ThemeData(
+          fontFamily: "Balkara",
+          //primarySwatch: Colors.blue,
+          backgroundColor: Color(0xFF36332e),
+          primaryColor: Color(0xFFb97b50),
+          secondaryHeaderColor: Color(0xFFEFE6DD),
+          buttonColor: Color(0xFF4c7e7a),
+          buttonTheme: ButtonThemeData(
+            textTheme: ButtonTextTheme.primary
+          ),
+          accentColor: Color(0xFFBB4430),
+          canvasColor: Color(0xFF36332e),
+          scaffoldBackgroundColor: Color(0xFF36332e),
+          bottomAppBarColor: Color(0xFF7EBDC2),
+          textTheme: TextTheme(
+            headline: TextStyle(color: Color(0xFFa85147)),
+            caption: TextStyle(color: Color(0xFFa85147)),
+            body1: TextStyle(color: Color(0xFFa85147)),
+            body2: TextStyle(color: Color(0xFFa85147)),
+            title: TextStyle(color: Color(0xFFa85147)),
+            subhead: TextStyle(color: Color(0xFFd6ceb9)),
+          )),
+      home: ComplexExample(), //MainCollapsingToolbar(),
     );
   }
 }

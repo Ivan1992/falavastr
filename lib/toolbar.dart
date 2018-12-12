@@ -1,6 +1,5 @@
 import 'package:falavastr/Modal.dart';
 import 'package:flutter/material.dart';
-import 'package:unicorndial/unicorndial.dart';
 
 import 'cstext.dart';
 
@@ -12,57 +11,12 @@ class MainCollapsingToolbar extends StatefulWidget {
 final items = List<String>.generate(10000, (i) => "Item $i");
 
 class _MainCollapsingToolbarState extends State<MainCollapsingToolbar> {
-  UnicornButton getButton(String text, Color buttonColor) {
-    return UnicornButton(
-      hasLabel: true,
-      labelText: text,
-      currentButton: FloatingActionButton(
-        heroTag: "train",
-        backgroundColor: buttonColor,
-        mini: true,
-        child: Icon(Icons.book),
-        onPressed: () {},
-      ),
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
     Modal m = new Modal();
-    var childButtons = List<UnicornButton>();
-
-    childButtons.add(
-      getButton("На Господи воззвах", Colors.redAccent),
-    );
-
-    childButtons.add(
-      getButton("Паремии", Colors.greenAccent),
-    );
-
-    childButtons.add(
-      getButton("На стиховне", Colors.greenAccent),
-    );
-
-    childButtons.add(
-      getButton("На Литии", Colors.greenAccent),
-    );
-
-    childButtons.add(
-      getButton("Стихера по 50м псалме", Colors.blueAccent),
-    );
-
-    childButtons.add(
-      getButton("Канон", Colors.blueAccent),
-    );
-
-    childButtons.add(
-      getButton("Стихеры на Хвалитех", Colors.blueAccent),
-    );
-
-    childButtons.add(
-      getButton("На литургии", Colors.cyanAccent),
-    );
-
+  
     TabBar _tab = TabBar(
       /* indicatorColor: Colors.red, */
       isScrollable: true,

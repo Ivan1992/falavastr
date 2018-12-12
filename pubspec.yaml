@@ -13,7 +13,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  unicorndial: ^1.1.5
+  scoped_model: ^1.0.1
   flutter:
     sdk: flutter
 
@@ -41,6 +41,15 @@ flutter:
     - family: Grebnev
       fonts:
         - asset: lib/fonts/GREBNEVUCS.TTF
+    - family: Balkara
+      fonts:
+        - asset: lib/fonts/Balkara.ttf
+    - family: OpenSans
+      fonts:
+        - asset: lib/fonts/OpenSans-Regular.ttf
+        - asset: lib/fonts/OpenSans-Bold.ttf
+        - asset: lib/fonts/OpenSans-Italic.ttf
+        - asset: lib/fonts/OpenSans-Light.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
