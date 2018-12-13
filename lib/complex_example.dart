@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:falavastr/cstext.dart';
+import 'package:falavastr/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'backdrop.dart';
@@ -49,7 +50,10 @@ class ComplexExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ScopedModel(
       model: FrontPanelModel(FrontPanels.tealPanel),
-      child: Scaffold(body: SafeArea(child: Panels(appBar))));
+      child: Scaffold(
+        drawer: DrawerOnly(),
+        body: SafeArea(child: Panels(appBar)),
+      ));
 }
 
 class Panels extends StatelessWidget {
@@ -200,14 +204,15 @@ class _BackPanelState extends State<BackPanel> {
                               rebuildOnChange: false,
                               builder: (context, _, model) => ListTile(
                                     title: Center(
-                                      child: Row(children: <Widget>[
+                                        child: Row(
+                                      children: <Widget>[
                                         Icon(Icons.book),
                                         Text(name,
-                                          style: TextStyle(
-                                            fontFamily: "Balkara",
-                                          )),
-                                      ],)
-                                    ),
+                                            style: TextStyle(
+                                              fontFamily: "Balkara",
+                                            )),
+                                      ],
+                                    )),
                                     selected: false,
                                     onTap: () {
                                       model.activate(FrontPanels.tealPanel);
