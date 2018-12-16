@@ -1,13 +1,13 @@
 import 'package:falavastr/complex_example.dart';
+import 'package:falavastr/pages/calendar.dart';
 import 'package:falavastr/pages/firstpage.dart';
 import 'package:falavastr/pages/secondpage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 
 class DrawerOnly extends StatelessWidget {
-
   final bool expanded;
-  DrawerOnly([this.expanded=false]);
+  DrawerOnly([this.expanded = false]);
 
   ListTile _getTile(BuildContext ctxt, String name,
       [Icon icon = const Icon(Icons.bookmark), double padding = 0.0]) {
@@ -23,7 +23,9 @@ class DrawerOnly extends StatelessWidget {
       onTap: () {
         Navigator.pop(ctxt);
         Navigator.push(
-            ctxt, MaterialPageRoute(builder: (ctxt) => UstavPage(name), fullscreenDialog: true));
+            ctxt,
+            MaterialPageRoute(
+                builder: (ctxt) => UstavPage(name), fullscreenDialog: true));
       },
     );
   }
@@ -70,7 +72,8 @@ class DrawerOnly extends StatelessWidget {
                               child: Padding(
                                 padding: EdgeInsets.all(3.0),
                                 child: Text("25",
-                                    style:Theme.of(ctxt).primaryTextTheme.title),
+                                    style:
+                                        Theme.of(ctxt).primaryTextTheme.title),
                               )),
                           Text("декабря",
                               style: Theme.of(ctxt).primaryTextTheme.title)
@@ -91,7 +94,7 @@ class DrawerOnly extends StatelessWidget {
                   Row(
                     /* crossAxisAlignment: CrossAxisAlignment.end, */
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[Text("Глас вторыи")],
+                    children: <Widget>[Text("Среда, глас вторыи")],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +102,14 @@ class DrawerOnly extends StatelessWidget {
                       FloatingActionButton(
                         mini: true,
                         backgroundColor: Theme.of(ctxt).buttonColor,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(ctxt)
+                              .push(new MaterialPageRoute<Null>(
+                                  builder: (BuildContext context) {
+                                    return CalendarPage();
+                                  },
+                                  fullscreenDialog: true));
+                        },
                         child: Icon(Icons.calendar_today),
                       ),
                     ],
