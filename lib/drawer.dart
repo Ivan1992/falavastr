@@ -1,7 +1,4 @@
-import 'package:falavastr/complex_example.dart';
-import 'package:falavastr/pages/calendar.dart';
-import 'package:falavastr/pages/firstpage.dart';
-import 'package:falavastr/pages/secondpage.dart';
+import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 
