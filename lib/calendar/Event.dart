@@ -8,6 +8,7 @@ class Event {
   final Color borderColor;
   final Color fillColor;
   final Decoration decoration;
+  final bool movable;
 
   Event({
     this.date,
@@ -16,6 +17,7 @@ class Event {
     this.shape,
     this.borderColor,
     this.fillColor,
-    this.decoration
+    this.decoration,
+    this.movable
   }) : assert(date != null);
 }

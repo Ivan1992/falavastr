@@ -13,7 +13,8 @@ class _CalendarPage extends State<CalendarPage> {
       date: DateTime(2018, 12, 1),
       borderColor: Colors.red,
       fillColor: Colors.blue,
-      shape: StadiumBorder(side: BorderSide(color: Colors.amber, width: 3.0)));
+      shape: StadiumBorder(side: BorderSide(color: Colors.amber, width: 3.0)),
+      movable: false);
   DateTime _currentDate = DateTime.now();
   @override
   Widget build(BuildContext context) {

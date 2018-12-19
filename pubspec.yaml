@@ -43,7 +43,7 @@ flutter:
   fonts:
     - family: Grebnev
       fonts:
-        - asset: lib/fonts/GREBNEVUCS.TTF
+        - asset: lib/fonts/GREBNEVUCS.TTF 
     - family: Balkara
       fonts:
         - asset: lib/fonts/Balkara.ttf

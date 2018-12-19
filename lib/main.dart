@@ -1,4 +1,3 @@
-import 'package:falavastr/complex_example.dart';
 import 'package:falavastr/pages/firstpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

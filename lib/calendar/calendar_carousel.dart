@@ -493,23 +493,22 @@ class _CalendarState extends State<CalendarCarousel> {
       bool isSelectable,
       TextStyle defaultTextStyle,
       TextStyle textStyle) {
+    Color borderColor = Colors.transparent;
+    Color fillColor = Colors.transparent;
 
-        if (widget.markedDatesMap != null && widget.markedDatesMap.length > 0) {
-          widget.markedDatesMap.forEach((event) {
-            if (event.date.month == now.month && event.date.day == now.day) {
-              
-            }
-          });
-        } else {
-
+    if (widget.markedDatesMap != null && widget.markedDatesMap.length > 0) {
+      widget.markedDatesMap.forEach((event) {
+        if (!event.movable) {
+          if (event.date.month == now.month && event.date.day == now.day) {
+            //borderColor = event.borderColor;
+            fillColor = event.fillColor;
+          }
         }
+      });
+    } else {}
 
     return FlatButton(
-      color: isSelectedDay && widget.todayBorderColor != null
-          ? widget.selectedDayBorderColor
-          : isToday && widget.todayBorderColor != null
-              ? widget.todayButtonColor
-              : widget.dayButtonColor,
+      color: borderColor,
       onPressed: () => _onDayPressed(now),
       padding: EdgeInsets.all(widget.dayPadding),
       shape: RoundedRectangleBorder(
@@ -520,7 +519,7 @@ class _CalendarState extends State<CalendarCarousel> {
                   ? widget.nextMonthDayBorderColor
                   : isToday && widget.todayBorderColor != null
                       ? widget.todayBorderColor
-                      : widget.thisMonthDayBorderColor,
+                      : fillColor,
         ),
       ),
       child: Center(
