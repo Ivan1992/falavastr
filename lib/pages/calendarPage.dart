@@ -1,4 +1,3 @@
-import 'package:falavastr/calendar/Event.dart';
 import 'package:falavastr/calendar/calendar_carousel.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +8,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPage extends State<CalendarPage> {
-  Event e = new Event(
-      date: DateTime(2018, 12, 1),
-      borderColor: Colors.red,
-      fillColor: Colors.blue,
-      shape: StadiumBorder(side: BorderSide(color: Colors.amber, width: 3.0)),
-      movable: false);
+
   DateTime _currentDate = DateTime.now();
   @override
   Widget build(BuildContext context) {
@@ -35,7 +29,6 @@ class _CalendarPage extends State<CalendarPage> {
                 color: Colors.red,
               ),
               locale: "ru",
-              markedDatesMap: <Event>[e],
               thisMonthDayBorderColor: Colors.grey,
               daysTextStyle: TextStyle(color: Colors.white),
               weekFormat: false,
