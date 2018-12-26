@@ -37,7 +37,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultWeekendTextStyle = TextStyle(
-    color: Colors.pinkAccent,
+    color: Colors.pink[100],
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveDaysTextStyle = TextStyle(
@@ -45,7 +45,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveWeekendTextStyle = TextStyle(
-    color: Colors.pinkAccent.withOpacity(0.6),
+    color: Colors.pink[100].withOpacity(0.6),
     fontSize: 14.0,
   );
   final Widget defaultMarkedDateWidget = Container(
@@ -496,25 +496,17 @@ class _CalendarState extends State<CalendarCarousel> {
       TextStyle textStyle) {
     Color borderColor = Colors.transparent;
     Color fillColor = Colors.transparent;
-
-    /* if (widget.markedDatesMap != null && widget.markedDatesMap.length > 0) {
-      widget.markedDatesMap.forEach((event) {
-        if (!event.movable) {
-          if (event.date.month == now.month && event.date.day == now.day) {
-            //borderColor = event.borderColor;
-            fillColor = Colors.red;
-          }
-        }
-      });
-    } else {} */
+    Color textColor = null;//Colors.white;
+    
     if (DateService.isPrazdnik(now, 0)) {
-      fillColor = Colors.red;
+      fillColor = Colors.red[800];
       borderColor = Colors.transparent;
+      textColor = Colors.white;
     } else if (DateService.isPrazdnik(now, 1)) {
       fillColor = Colors.transparent;
-      borderColor = Colors.red;
+      borderColor = Colors.red[800];
     } else if (DateService.isFastDay(now)) {
-      fillColor = Colors.grey;
+      fillColor = Colors.grey[600];
       borderColor = Colors.transparent;
     }
     
@@ -937,7 +929,7 @@ class _CalendarState extends State<CalendarCarousel> {
   Widget _renderMarkedMapContainer(DateTime now) {
     if (widget.markedDateShowIcon) {
       return Stack(
-        children: _renderCSMap(now), //_renderMarkedMap(now),
+        children: _renderMarkedMap(now), //_renderMarkedMap(now),
       );
     } else {
       return Container(
@@ -947,43 +939,10 @@ class _CalendarState extends State<CalendarCarousel> {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _renderCSMap(now), //_renderMarkedMap(now),
+          children: _renderMarkedMap(now), //_renderMarkedMap(now),
         ),
       );
     }
-  }
-
-  List<Widget> _renderCSMap(DateTime now) {
-    if (widget.markedDatesMap != null && widget.markedDatesMap.length > 0) {
-      List<Widget> tmp = [];
-      widget.markedDatesMap.forEach((event) {
-        if (event.date.month == now.month && event.date.day == now.day) {
-          //tmp.add(widget.defaultMarkedDateWidget);
-          tmp.add(Container(
-            padding: EdgeInsets.zero,
-            decoration: widget.markedDateMoreCustomDecoration == null
-                ? new BoxDecoration(
-                    /* color: Colors.red, */
-                    borderRadius: BorderRadius.all(Radius.circular(1000.0)),
-                  )
-                : widget.markedDateMoreCustomDecoration,
-            child: Center(
-              child: Text(
-                "${now.day}",
-                style: widget.markedDateMoreCustomTextStyle == null
-                    ? TextStyle(
-                        fontSize: 9.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.normal)
-                    : widget.markedDateMoreCustomTextStyle,
-              ),
-            ),
-          ));
-        }
-      });
-      return tmp;
-    }
-    return [];
   }
 
   List<Widget> _renderMarkedMap(DateTime now) {

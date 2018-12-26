@@ -1,10 +1,14 @@
+import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:flutter/material.dart';
 
 class UstavPage extends StatelessWidget {
   final String name;
-  UstavPage(this.name);
+  //final String text;
+  final DayText day;
+
+  UstavPage(this.name, this.day);
 
   void showMenuSelection(String value) {
     print('You selected: $value');
@@ -12,6 +16,8 @@ class UstavPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("**************");
+    print(day);
     return Scaffold(
       drawer: DrawerOnly(true),
       appBar: AppBar(
@@ -64,7 +70,6 @@ class UstavPage extends StatelessWidget {
                           value: 2.5),
                     ),
                   ]),
-          /* IconButton(onPressed: () {}, icon: Icon(Icons.format_size)), */
           IconButton(
             onPressed: () {},
             icon: Icon(Icons.fullscreen),
@@ -78,7 +83,7 @@ class UstavPage extends StatelessWidget {
       body: Center(
         child: Container(
           color: Colors.white,
-          child: CsText(),
+          child: CsText(day.sluzhby[0].parts["Вечерня"]),
         ),
       ),
     );

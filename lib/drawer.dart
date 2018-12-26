@@ -1,12 +1,14 @@
+import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class DrawerOnly extends StatelessWidget {
   final bool expanded;
   DrawerOnly([this.expanded = false]);
 
-  ListTile _getTile(BuildContext ctxt, String name,
+  ListTile _getTile(BuildContext ctxt, String name, DayText day,
       [Icon icon = const Icon(Icons.bookmark), double padding = 0.0]) {
     return ListTile(
       leading: icon,
@@ -22,15 +24,18 @@ class DrawerOnly extends StatelessWidget {
         Navigator.push(
             ctxt,
             MaterialPageRoute(
-                builder: (ctxt) => UstavPage(name), fullscreenDialog: true));
+                builder: (ctxt) => UstavPage(name, day),
+                fullscreenDialog: true));
       },
     );
   }
 
-  @override
-  Widget build(BuildContext ctxt) {
+  Future<List<ListTile>> getAllTiles(BuildContext ctxt) async {
+    DayText day = await DayTextService.getText(
+        DateTime(2018, DateTime.january, 1), TEXTTYPE.MINEA);
+
     const List<String> names = [
-      "Святцы",
+      "СВЯТЦЫ",
       "ТРОПАРИ",
       "ЕВАНГЕЛИЕ",
       "АПОСТОЛ",
@@ -38,96 +43,107 @@ class DrawerOnly extends StatelessWidget {
       "ОКТАЙ",
       "ТРИОДЬ"
     ];
-    List<Widget> sublist = names.map<ListTile>((name) {
-      return _getTile(ctxt, name, Icon(Icons.subdirectory_arrow_right), 10.0);
+
+    List<ListTile> sublist = names.map((name) {
+      return _getTile(
+          ctxt, name, day, Icon(Icons.subdirectory_arrow_right), 10.0);
     }).toList();
 
-    return Drawer(
-      child: ListView(
-        /*  shrinkWrap: true, */
-        children: <Widget>[
-          DrawerHeader(
-            decoration: BoxDecoration(color: Colors.black),
-            child: Container(
-              child: Column(
-                /* crossAxisAlignment: CrossAxisAlignment.center, */
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return sublist;
+  }
+
+  @override
+  Widget build(BuildContext ctxt) {
+    return FutureBuilder(
+      future: getAllTiles(ctxt),
+      builder: (BuildContext ctxt, AsyncSnapshot<List<ListTile>> snapshot) {
+        return Drawer(
+          child: ListView(
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(color: Colors.black),
+                child: Container(
+                  child: Column(
                     children: <Widget>[
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Container(
-                              decoration: ShapeDecoration(
-                                shape: const StadiumBorder(
-                                  side: BorderSide(
-                                    color: Colors.red,
-                                    width: 3.0,
+                          Column(
+                            children: <Widget>[
+                              Container(
+                                  decoration: ShapeDecoration(
+                                    shape: const StadiumBorder(
+                                      side: BorderSide(
+                                        color: Colors.red,
+                                        width: 3.0,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(3.0),
+                                    child: Text("25",
+                                        style: Theme.of(ctxt)
+                                            .primaryTextTheme
+                                            .title),
+                                  )),
+                              Text("декабря",
+                                  style: Theme.of(ctxt).primaryTextTheme.title)
+                            ],
+                          ),
+                          Column(
+                            children: <Widget>[
+                              Text("Пища с маслом",
+                                  style: TextStyle(color: Colors.white)),
+                              RaisedButton(
+                                onPressed: () {},
+                                child: Text("Подробнее..."),
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.all(3.0),
-                                child: Text("25",
-                                    style:
-                                        Theme.of(ctxt).primaryTextTheme.title),
-                              )),
-                          Text("декабря",
-                              style: Theme.of(ctxt).primaryTextTheme.title)
+                            ],
+                          )
                         ],
                       ),
-                      Column(
+                      Row(
+                        /* crossAxisAlignment: CrossAxisAlignment.end, */
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[Text("Среда, глас вторыи")],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text("Пища с маслом",
-                              style: TextStyle(color: Colors.white)),
-                          RaisedButton(
-                            onPressed: () {},
-                            child: Text("Подробнее..."),
+                          FloatingActionButton(
+                            mini: true,
+                            backgroundColor: Theme.of(ctxt).buttonColor,
+                            onPressed: () {
+                              Navigator.of(ctxt)
+                                  .push(new MaterialPageRoute<Null>(
+                                      builder: (BuildContext context) {
+                                        return CalendarPage();
+                                      },
+                                      fullscreenDialog: true));
+                            },
+                            child: Icon(Icons.calendar_today),
                           ),
                         ],
                       )
                     ],
                   ),
-                  Row(
-                    /* crossAxisAlignment: CrossAxisAlignment.end, */
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[Text("Среда, глас вторыи")],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FloatingActionButton(
-                        mini: true,
-                        backgroundColor: Theme.of(ctxt).buttonColor,
-                        onPressed: () {
-                          Navigator.of(ctxt)
-                              .push(new MaterialPageRoute<Null>(
-                                  builder: (BuildContext context) {
-                                    return CalendarPage();
-                                  },
-                                  fullscreenDialog: true));
-                        },
-                        child: Icon(Icons.calendar_today),
-                      ),
-                    ],
-                  )
-                ],
+                ),
               ),
-            ),
+              ExpansionTile(
+                  initiallyExpanded: expanded,
+                  leading: Icon(Icons.bookmark),
+                  title: Text("Устав на сегодня",
+                      style: TextStyle(
+                          color: Theme.of(ctxt).primaryTextTheme.title.color)),
+                  children: snapshot.data),
+              /* _getTile(ctxt, "Библиотека", Icon(Icons.stars)),
+              _getTile(ctxt, "Ежедневные молитвы", Icon(Icons.calendar_today)),
+              _getTile(ctxt, "Канонник", Icon(Icons.format_list_bulleted)),
+              _getTile(ctxt, "О программе", Icon(Icons.info)), */
+            ],
           ),
-          ExpansionTile(
-              initiallyExpanded: expanded,
-              leading: Icon(Icons.bookmark),
-              title: Text("Устав на сегодня",
-                  style: TextStyle(
-                      color: Theme.of(ctxt).primaryTextTheme.title.color)),
-              children: sublist),
-          _getTile(ctxt, "Библиотека", Icon(Icons.stars)),
-          _getTile(ctxt, "Ежедневные молитвы", Icon(Icons.calendar_today)),
-          _getTile(ctxt, "Канонник", Icon(Icons.format_list_bulleted)),
-          _getTile(ctxt, "О программе", Icon(Icons.info)),
-        ],
-      ),
+        );
+      },
     );
   }
 }

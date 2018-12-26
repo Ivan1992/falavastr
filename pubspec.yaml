@@ -54,6 +54,10 @@ flutter:
         - asset: lib/fonts/OpenSans-Italic.ttf
         - asset: lib/fonts/OpenSans-Light.ttf
 
+  assets:
+    - lib/calendar/json/yanvar.json
+    - lib/calendar/json/fevral.json
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
