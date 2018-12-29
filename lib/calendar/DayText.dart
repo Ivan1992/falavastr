@@ -20,7 +20,7 @@ class DayTextService {
   ];
 
   static Future<String> _loadAStudentAsset(String name) async {
-    return await rootBundle.loadString('lib/calendar/json/$name');
+    return await rootBundle.loadString('lib/calendar/json/minea/$name');
   }
 
   static Future<DayText> getText(DateTime day, TEXTTYPE type) async {
@@ -58,16 +58,10 @@ class DayText {
   DayText({this.title, this.sluzhby});
 
   factory DayText.fromJson(List<dynamic> parsedJson, int day) {
-    //List<Sluzhba> sluzhby = new List<Sluzhba>();
-    //print( parsedJson[day]['sluzhby']);
-    var list = parsedJson[day]['sluzhby'] as List;
-    print(">>>>>>>>>>>>>>>>>>>>>>=${list.runtimeType}");
+    var list = parsedJson[day-1]['sluzhby'] as List;
 
     List<Sluzhba> sluzhby = list.map( (i) => Sluzhba.fromJson(i)).toList();
         
-    sluzhby.forEach( (x) {
-      print(">>>>>>${x.parts.length}");
-    });
 
     return DayText(
       title: parsedJson[day]['title'],
@@ -81,24 +75,19 @@ class DayText {
 }
 
 class Sluzhba {
-  final Map<String,String> parts;
+  final List<Part> parts;
 
   Sluzhba({this.parts});
 
   factory Sluzhba.fromJson(List<dynamic> parsedJson) {
-    Map<String, String> vals = new Map<String,String>();
-    parsedJson.forEach((map) {
-      String key, value;
-      map.forEach( (k,v) {
-        //print("###### k=$k v=$v");
-        if (k == "name") {
-          key = v;
-        } else {
-          value = v;
-        }
-      });
-      vals[key] = value;
-    });
-    return Sluzhba(parts: vals);
+    List<Part> p = parsedJson.map((i) => Part(name: i["name"], text: i["text"])).toList();
+    return Sluzhba(parts: p);
   }
+}
+
+class Part {
+  final String name;
+  final String text;
+
+  Part({this.name, this.text});
 }

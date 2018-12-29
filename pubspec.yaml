@@ -55,8 +55,9 @@ flutter:
         - asset: lib/fonts/OpenSans-Light.ttf
 
   assets:
-    - lib/calendar/json/yanvar.json
-    - lib/calendar/json/fevral.json
+    - lib/calendar/json/minea/yanvar.json
+    - lib/calendar/json/minea/fevral.json
+    - lib/calendar/json/svyatcy/svyatcy.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

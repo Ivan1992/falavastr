@@ -36,7 +36,6 @@ class DrawerOnly extends StatelessWidget {
 
     const List<String> names = [
       "СВЯТЦЫ",
-      "ТРОПАРИ",
       "ЕВАНГЕЛИЕ",
       "АПОСТОЛ",
       "МИНЕЯ",

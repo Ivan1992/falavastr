@@ -3,25 +3,71 @@ import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:flutter/material.dart';
 
-class UstavPage extends StatelessWidget {
+class UstavPage extends StatefulWidget {
   final String name;
-  //final String text;
   final DayText day;
 
   UstavPage(this.name, this.day);
+
+  @override
+  State<StatefulWidget> createState() => _UstavPageState();
+}
+
+class _UstavPageState extends State<UstavPage> {
+  CsText _cstext;
+  int currentSluzhba = 0;
 
   void showMenuSelection(String value) {
     print('You selected: $value');
   }
 
   @override
+  void initState() {
+    super.initState();
+    _cstext = CsText(widget.day.sluzhby[0].parts[0].text);
+  }
+
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text("Выберите часть"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: widget.day.sluzhby[currentSluzhba].parts
+                .map((part) => FlatButton(
+                      onPressed: () {
+                        setState(() {
+                          _cstext = CsText(part.text);
+                          Navigator.of(context).pop();
+                        });
+                      },
+                      child: Text(part.name),
+                    ))
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print("**************");
-    print(day);
+    FloatingActionButton fab;
+    if (widget.day.sluzhby[currentSluzhba].parts.length > 1) {
+      fab = FloatingActionButton(
+        onPressed: () => _showDialog(),
+        child: Icon(Icons.menu),
+      );
+    }
+
     return Scaffold(
       drawer: DrawerOnly(true),
+      floatingActionButton: fab,
       appBar: AppBar(
-        title: Text(name),
+        title: Text(widget.name),
         actions: <Widget>[
           PopupMenuButton<String>(
               icon: Icon(Icons.format_size),
@@ -83,7 +129,7 @@ class UstavPage extends StatelessWidget {
       body: Center(
         child: Container(
           color: Colors.white,
-          child: CsText(day.sluzhby[0].parts["Вечерня"]),
+          child: _cstext,
         ),
       ),
     );

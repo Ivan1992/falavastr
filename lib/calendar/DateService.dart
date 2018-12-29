@@ -110,7 +110,7 @@ List<Event> prazdniki = [
   Event(type: 1, name: "Антипасха", movable: true, daysShift: 7),
   Event(type: 1, name: "Вознесение", movable: true, daysShift: 40),
   Event(type: 0, name: "Троица", movable: true, daysShift: 49),
-  Event(date: DateTime(2018, 9, 21), type: 0, name: "Рождество Пресвятой Богородицы"),
+  Event(date:DateTime(2018, 9, 21), type: 0, name: "Рождество Пресвятой Богородицы"),
   Event(date:DateTime(2018, 9, 27), type: 0, name: "Воздвижение Креста Господня"),
   Event(date:DateTime(2018, 12, 4), type: 0, name: "Введение во храм Пресвятой Богородицы"),
   Event(date:DateTime(2018, 1, 7), type: 0, name: "Рождество Христово"),
