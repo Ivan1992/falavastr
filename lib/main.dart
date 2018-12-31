@@ -1,4 +1,4 @@
-import 'package:falavastr/pages/firstpage.dart';
+import 'package:falavastr/pages/infopage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       statusBarColor: Color(0xFFb97b50), //or set color with: Color(0xFF0000FF)
     ));
     return MaterialApp(
-      title: 'Алавастр2',
+      title: 'Алавастр',
       theme: ThemeData(
         fontFamily: "Balkara",
         //primarySwatch: Colors.blue,
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         ),
         brightness: Brightness.dark,
       ),
-      home: FirstPage(), //MainCollapsingToolbar(),
+      home: InfoPage(today: DateTime.now()), //MainCollapsingToolbar(),
     );
   }
 }

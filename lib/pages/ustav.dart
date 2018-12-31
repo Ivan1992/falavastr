@@ -1,6 +1,7 @@
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
+import 'package:falavastr/pages/calendarPage.dart';
 import 'package:flutter/material.dart';
 
 class UstavPage extends StatefulWidget {
@@ -121,7 +122,14 @@ class _UstavPageState extends State<UstavPage> {
             icon: Icon(Icons.fullscreen),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute<Null>(
+                    builder: (BuildContext context) {
+                      return CalendarPage(widget.day.today);
+                    }),
+              );
+            },
             icon: Icon(Icons.today),
           ),
         ],
@@ -129,7 +137,10 @@ class _UstavPageState extends State<UstavPage> {
       body: Center(
         child: Container(
           color: Colors.white,
-          child: _cstext,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(10.0,0.0,10.0,0.0),
+            child: _cstext,
+          ),
         ),
       ),
     );

@@ -4,39 +4,50 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
 class DayTextService {
-  static List<String> _minea = [
+  static const List<String> _minea = [
     "yanvar.json",
-    "fevral.json",
     "yanvar.json",
-    "fevral.json",
     "yanvar.json",
-    "fevral.json",
     "yanvar.json",
-    "fevral.json",
     "yanvar.json",
-    "fevral.json",
     "yanvar.json",
-    "fevral.json"
+    "yanvar.json",
+    "yanvar.json",
+    "yanvar.json",
+    "yanvar.json",
+    "yanvar.json",
+    "yanvar.json"
   ];
 
-  static Future<String> _loadAStudentAsset(String name) async {
+  static DateTime today = DateTime.now();
+
+  static Future<String> _loadMinea(String name) async {
     return await rootBundle.loadString('lib/calendar/json/minea/$name');
   }
 
-  static Future<DayText> getText(DateTime day, TEXTTYPE type) async {
-    String jsonString; // = await _loadAStudentAsset(_minea[day.month]);
-    //final jsonResponse = json.decode(jsonString);
+  static Future<String> _loadSvyatcy() async {
+    return await rootBundle
+        .loadString('lib/calendar/json/svyatcy/svyatcy.json');
+  }
+
+  static Future<DayText> getDayText(DateTime day, TEXTTYPE type) async {
+    String jsonString;
+    today = day;
+    DayText d;
 
     switch (type) {
       case TEXTTYPE.SVYATCY:
-        break;
+        jsonString = await _loadSvyatcy();
+        d = DayText.svyatcy(json.decode(jsonString), day.day, day.month);
+        d.today = day;
+        return d;
 
       case TEXTTYPE.MINEA:
-        jsonString = (await _loadAStudentAsset(_minea[day.month]));
-        return DayText.fromJson(json.decode(jsonString), day.day);
-        break;
+        jsonString = await _loadMinea(_minea[day.month-1]);
+        d = DayText.mineaDay(json.decode(jsonString), day.day);
+        d.today = day;
+        return d;
 
-      case TEXTTYPE.TROPARY:
       case TEXTTYPE.EVANGELIE:
       case TEXTTYPE.APOSTOL:
       case TEXTTYPE.OKTAY:
@@ -45,23 +56,31 @@ class DayTextService {
       default:
         return null;
     }
-    return null;
   }
 }
 
-enum TEXTTYPE { SVYATCY, TROPARY, EVANGELIE, APOSTOL, MINEA, OKTAY, TRIOD }
+enum TEXTTYPE { SVYATCY, EVANGELIE, APOSTOL, MINEA, OKTAY, TRIOD }
 
 class DayText {
   final String title;
   final List<Sluzhba> sluzhby;
+  DateTime today;
 
   DayText({this.title, this.sluzhby});
 
-  factory DayText.fromJson(List<dynamic> parsedJson, int day) {
-    var list = parsedJson[day-1]['sluzhby'] as List;
 
-    List<Sluzhba> sluzhby = list.map( (i) => Sluzhba.fromJson(i)).toList();
-        
+
+  factory DayText.svyatcy(List<dynamic> parsedJson, int day, int month) {
+    var list = parsedJson
+        .where((x) => x["day"] == day && x["month"] == month)
+        .toList();
+    List<Sluzhba> sluzhby = List()..add(Sluzhba.svyatcy(list[0]));
+    return DayText(title: "Святцы", sluzhby: sluzhby);
+  }
+
+  factory DayText.mineaDay(List<dynamic> parsedJson, int day) {
+    var list = parsedJson[day - 1]['sluzhby'] as List;
+    List<Sluzhba> sluzhby = list.map((i) => Sluzhba.minea(i)).toList();
 
     return DayText(
       title: parsedJson[day]['title'],
@@ -79,8 +98,23 @@ class Sluzhba {
 
   Sluzhba({this.parts});
 
-  factory Sluzhba.fromJson(List<dynamic> parsedJson) {
-    List<Part> p = parsedJson.map((i) => Part(name: i["name"], text: i["text"])).toList();
+  factory Sluzhba.svyatcy(Map<String, dynamic> parsedJson) {
+    List<Part> p = List()
+      ..add(Part(
+          name: "Святцы",
+          text: parsedJson["saints"] +
+              "\n" +
+              parsedJson["tropar"] +
+              (parsedJson["tropar"].length > 0
+                  ? "\n" + parsedJson["tropar"]
+                  : "")));
+
+    return Sluzhba(parts: p);
+  }
+
+  factory Sluzhba.minea(List<dynamic> parsedJson) {
+    List<Part> p =
+        parsedJson.map((i) => Part(name: i["name"], text: i["text"])).toList();
     return Sluzhba(parts: p);
   }
 }

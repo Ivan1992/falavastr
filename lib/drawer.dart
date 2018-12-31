@@ -31,7 +31,7 @@ class DrawerOnly extends StatelessWidget {
   }
 
   Future<List<ListTile>> getAllTiles(BuildContext ctxt) async {
-    DayText day = await DayTextService.getText(
+    DayText day = await DayTextService.getDayText(
         DateTime(2018, DateTime.january, 1), TEXTTYPE.MINEA);
 
     const List<String> names = [
