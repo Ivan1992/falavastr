@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 
 class CsText extends StatefulWidget {
-
   final String text;
-  CsText(this.text);
+  final ScrollController controller;
+  CsText(this.text, this.controller);
 
   @override
   State<StatefulWidget> createState() => _CsText();
@@ -26,7 +27,7 @@ class _CsText extends State<CsText> {
     _fontSize = prefs.getDouble("fontSize") ?? 2.0;
     _fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
   }
- 
+
   List<Widget> _parseText(String text) {
     List<Widget> toReturn = [];
     if (!text.contains(r"<r>")) {
@@ -114,12 +115,25 @@ class _CsText extends State<CsText> {
 
   @override
   Widget build(BuildContext context) {
+     //final ScrollController _controller
+
     return GestureDetector(
       onScaleStart: _handleOnScaleStart,
       onScaleUpdate: _handleScaleUpdate,
-      child: ListView(
-        children: _parseText(widget.text),
+      child: DraggableScrollbar.semicircle(
+        backgroundColor: Theme.of(context).accentColor,
+        child: ListView(
+          controller: widget.controller,
+          padding: EdgeInsets.all(10.0),
+          children: _parseText(widget.text),
+        ),
+        controller: widget.controller,
       ),
+      /* child: ListView(
+        controller: _controller,
+        padding: EdgeInsets.all( 10.0),
+        children: _parseText(widget.text),
+      ), */
     );
   }
 }

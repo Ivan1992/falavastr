@@ -1,12 +1,35 @@
+import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'dart:async';
+
+import 'package:intl/intl.dart';
 
 class DrawerOnly extends StatelessWidget {
   final bool expanded;
-  DrawerOnly([this.expanded = false]);
+  final DateTime _today = DateTime.now();
+
+  DrawerOnly([this.expanded = false]) {
+    initializeDateFormatting("ru");
+  }
+
+  ListTile _getDummy(BuildContext ctxt, String name,
+      [Icon icon = const Icon(Icons.bookmark), double padding = 0.0]) {
+    return ListTile(
+      leading: icon,
+      title: Padding(
+        padding: EdgeInsets.only(left: padding),
+        child: Text(
+          name,
+          style: TextStyle(color: Theme.of(ctxt).primaryTextTheme.title.color),
+        ),
+      ),
+      onTap: () {},
+    );
+  }
 
   ListTile _getTile(BuildContext ctxt, String name, DayText day,
       [Icon icon = const Icon(Icons.bookmark), double padding = 0.0]) {
@@ -31,8 +54,7 @@ class DrawerOnly extends StatelessWidget {
   }
 
   Future<List<ListTile>> getAllTiles(BuildContext ctxt) async {
-    DayText day = await DayTextService.getDayText(
-        DateTime(2018, DateTime.january, 1), TEXTTYPE.MINEA);
+    DayText day = await DayTextService.getDayText(_today, TEXTTYPE.MINEA);
 
     const List<String> names = [
       "СВЯТЦЫ",
@@ -53,6 +75,10 @@ class DrawerOnly extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctxt) {
+    String _month = DateFormat("MMMM", "ru").format(_today);
+    String _weekday = DateFormat("EEEE", "ru").format(_today);
+    String _glas = DateService.glasString(_today);
+
     return FutureBuilder(
       future: getAllTiles(ctxt),
       builder: (BuildContext ctxt, AsyncSnapshot<List<ListTile>> snapshot) {
@@ -80,12 +106,12 @@ class DrawerOnly extends StatelessWidget {
                                   ),
                                   child: Padding(
                                     padding: EdgeInsets.all(3.0),
-                                    child: Text("25",
+                                    child: Text("${_today.day}",
                                         style: Theme.of(ctxt)
                                             .primaryTextTheme
                                             .title),
                                   )),
-                              Text("декабря",
+                              Text(_month,
                                   style: Theme.of(ctxt).primaryTextTheme.title)
                             ],
                           ),
@@ -93,18 +119,17 @@ class DrawerOnly extends StatelessWidget {
                             children: <Widget>[
                               Text("Пища с маслом",
                                   style: TextStyle(color: Colors.white)),
-                              RaisedButton(
+                              /* RaisedButton(
                                 onPressed: () {},
                                 child: Text("Подробнее..."),
-                              ),
+                              ), */
                             ],
                           )
                         ],
                       ),
                       Row(
-                        /* crossAxisAlignment: CrossAxisAlignment.end, */
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[Text("Среда, глас вторыи")],
+                        children: <Widget>[Text("$_weekday, глас $_glas")],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -135,10 +160,10 @@ class DrawerOnly extends StatelessWidget {
                       style: TextStyle(
                           color: Theme.of(ctxt).primaryTextTheme.title.color)),
                   children: snapshot.data),
-              /* _getTile(ctxt, "Библиотека", Icon(Icons.stars)),
-              _getTile(ctxt, "Ежедневные молитвы", Icon(Icons.calendar_today)),
-              _getTile(ctxt, "Канонник", Icon(Icons.format_list_bulleted)),
-              _getTile(ctxt, "О программе", Icon(Icons.info)), */
+              _getDummy(ctxt, "Библиотека", Icon(Icons.stars)),
+              _getDummy(ctxt, "Ежедневные молитвы", Icon(Icons.calendar_today)),
+              _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted)),
+              _getDummy(ctxt, "О программе", Icon(Icons.info)),
             ],
           ),
         );

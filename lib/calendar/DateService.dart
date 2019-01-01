@@ -1,3 +1,5 @@
+import 'package:date_utils/date_utils.dart';
+
 import 'Event.dart';
 
 class DateService {
@@ -17,6 +19,23 @@ class DateService {
       noviyStil = DateTime(god, 4, easter).add(Duration(days: 13));
     }
     return noviyStil;
+  }
+
+  static String glasString(DateTime today) {
+    return (["первыи","вторыи","третии","четвертыи","пятыи","шестыи","седьмыи","осьмыи"])[glas(today)-1];
+  }
+
+  static int glas(DateTime today) {
+    int year = today.year;
+    DateTime p = pasha(year);
+    today = today.subtract(Duration(days: 7));
+    if (today.isBefore(p)) {
+      p = pasha(year - 1);
+    }
+    // print(">>>>>>>>TODAY=$today PASHa=$p");
+    int r = (((today.millisecondsSinceEpoch - p.millisecondsSinceEpoch).abs()) / (7*24*60*60*1000)).round();
+    print("r=$r");
+    return (r%8) + 1;
   }
 
   static bool isFastDay(DateTime d) {
@@ -48,8 +67,8 @@ class DateService {
     }
 
     //ВЕЛИКИЙ Пост
-    start = DateTime(p.year, p.month, p.day);
-    end = start.subtract(Duration(days: 48));
+    end = DateTime(p.year, p.month, p.day);
+    start = end.subtract(Duration(days: 48));
     if (d.compareTo(start) >= 0 && d.compareTo(end) <= 0 ) {
       return true;
     }

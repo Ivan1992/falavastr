@@ -85,7 +85,7 @@ class _MainCollapsingToolbarState extends State<MainCollapsingToolbar> {
                         childButtons: childButtons), */
                     body: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Center(child: CsText("")),
+                      child: Center(child: CsText("", null)),
                     ),
                   ),
                   Center(child: Text("Таб 2")),

@@ -1,3 +1,4 @@
+import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/calendarPage.dart';
@@ -32,7 +33,7 @@ class InfoPage extends StatelessWidget {
           side: BorderSide(color: Colors.redAccent, width: 2.0),
         ),
         onPressed: () async {
-          DayText d = await DayTextService.getDayText(today, type);
+          DayText d = await DayTextService.getDayText(today.subtract(Duration(days: 13)), type);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -55,6 +56,8 @@ class InfoPage extends StatelessWidget {
       ..add(_button("Апостол", context))
       ..add(_button("Минея", context, TEXTTYPE.MINEA))
       ..add(_button("Октай", context));
+
+    String glas = DateService.glasString(today);
 
     return Scaffold(
       drawer: DrawerOnly(),
@@ -88,7 +91,7 @@ class InfoPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Text("Глас шестыи"),
+              Text("Глас $glas"),
               Text("пища с рыбой"),
             ],
           ),

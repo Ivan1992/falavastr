@@ -17,6 +17,7 @@ dependencies:
   shared_preferences: ^0.4.3
   intl: ^0.15.7
   date_utils: ^0.1.0+2
+  draggable_scrollbar: ^0.0.4
   flutter:
     sdk: flutter
 
