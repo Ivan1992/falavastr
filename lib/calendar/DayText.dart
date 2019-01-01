@@ -6,17 +6,17 @@ import 'package:flutter/services.dart' show rootBundle;
 class DayTextService {
   static const List<String> _minea = [
     "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json",
-    "yanvar.json"
+    "fevral.json",
+    "mart.json",
+    "aprel.json",
+    "maii.json",
+    "juni.json",
+    "july.json",
+    "avgust.json",
+    "september.json",
+    "october.json",
+    "november.json",
+    "december.json"
   ];
 
   static DateTime today = DateTime.now();

@@ -57,6 +57,16 @@ flutter:
   assets:
     - lib/calendar/json/minea/yanvar.json
     - lib/calendar/json/minea/fevral.json
+    - lib/calendar/json/minea/mart.json
+    - lib/calendar/json/minea/aprel.json
+    - lib/calendar/json/minea/maii.json
+    - lib/calendar/json/minea/juni.json
+    - lib/calendar/json/minea/july.json
+    - lib/calendar/json/minea/avgust.json
+    - lib/calendar/json/minea/september.json
+    - lib/calendar/json/minea/october.json
+    - lib/calendar/json/minea/november.json
+    - lib/calendar/json/minea/december.json
     - lib/calendar/json/svyatcy/svyatcy.json
 
   # To add assets to your application, add an assets section, like this:

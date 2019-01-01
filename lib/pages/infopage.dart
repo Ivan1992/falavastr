@@ -104,17 +104,3 @@ class InfoPage extends StatelessWidget {
     );
   }
 }
-
-/* 
-RaisedButton(
-            child: Text("Календарь"),
-            onPressed: () {
-              Navigator.of(context).push(
-                new MaterialPageRoute<Null>(
-                    builder: (BuildContext context) {
-                      return CalendarPage();
-                    },
-                    fullscreenDialog: true),
-              );
-            }),
-*/
