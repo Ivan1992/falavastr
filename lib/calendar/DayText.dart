@@ -1,6 +1,7 @@
 //import 'package:flutter/material.dart';
 import 'dart:async' show Future;
 import 'dart:convert';
+import 'package:falavastr/calendar/DateService.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class DayTextService {
@@ -19,15 +20,14 @@ class DayTextService {
     "december.json"
   ];
 
+  static const String _mineaPath =  "lib/calendar/json/minea/";
+  static const String _oktay =      "lib/calendar/json/oktay/oktay.json";
+  static const String _svyatcy =    "lib/calendar/json/svyatcy/svyatcy.json";
+
   static DateTime today = DateTime.now();
 
-  static Future<String> _loadMinea(String name) async {
-    return await rootBundle.loadString('lib/calendar/json/minea/$name');
-  }
-
-  static Future<String> _loadSvyatcy() async {
-    return await rootBundle
-        .loadString('lib/calendar/json/svyatcy/svyatcy.json');
+  static Future<String> _load(String path) async {
+    return await rootBundle.loadString(path);
   }
 
   static Future<DayText> getDayText(DateTime day, TEXTTYPE type) async {
@@ -37,13 +37,13 @@ class DayTextService {
 
     switch (type) {
       case TEXTTYPE.SVYATCY:
-        jsonString = await _loadSvyatcy();
+        jsonString = await _load(_svyatcy);
         d = DayText.svyatcy(json.decode(jsonString), day.day, day.month);
         d.today = day;
         return d;
 
       case TEXTTYPE.MINEA:
-        jsonString = await _loadMinea(_minea[day.month-1]);
+        jsonString = await _load("$_mineaPath${_minea[day.month-1]}");
         d = DayText.mineaDay(json.decode(jsonString), day.day);
         d.today = day;
         return d;
@@ -51,6 +51,10 @@ class DayTextService {
       case TEXTTYPE.EVANGELIE:
       case TEXTTYPE.APOSTOL:
       case TEXTTYPE.OKTAY:
+        jsonString = await _load(_oktay);
+        d = DayText.oktay(json.decode(jsonString), DateService.glas(day), day.weekday);
+        d.today = day;
+        return d;
       case TEXTTYPE.TRIOD:
 
       default:
@@ -68,7 +72,16 @@ class DayText {
 
   DayText({this.title, this.sluzhby});
 
-
+  factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {
+    /*
+    var glasy = /<c><r>конeцъ .*? глaсу\.<\/r><\/c>/gi;	
+    var glasySplit = contents.split(glasy);
+    var day = /\r\nВ<r>. ?.*? вeчеръ/gi; */
+    
+    var glasObj = parsedJson[glas-1]["text"][(weekday+1) % 7];
+    List<Sluzhba> sluzhby = List()..add(Sluzhba.oktay(glasObj));
+    return DayText(sluzhby: sluzhby, title: "Октай");
+  }
 
   factory DayText.svyatcy(List<dynamic> parsedJson, int day, int month) {
     var list = parsedJson
@@ -109,6 +122,11 @@ class Sluzhba {
                   ? "\n" + parsedJson["tropar"]
                   : "")));
 
+    return Sluzhba(parts: p);
+  }
+
+  factory Sluzhba.oktay(Map<String, dynamic> parsedJson) {
+    List<Part> p = List()..add(Part(name: parsedJson["name"], text: parsedJson["text"]));
     return Sluzhba(parts: p);
   }
 

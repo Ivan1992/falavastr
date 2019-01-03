@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFF36332e),
         bottomAppBarColor: Color(0xFF7EBDC2),
         textTheme: TextTheme(
-          headline: TextStyle(color: Color(0xFFa85147)),
-          caption: TextStyle(color: Color(0xFFa85147)),
-          body1: TextStyle(color: Color(0xFFa85147)),
+          headline: TextStyle(color: Colors.red),//Color(0xFFa85147)),
+          caption: TextStyle(color: Colors.white),//Color(0xFFa85147)),
+          body1: TextStyle(color: Colors.red[300]),//Color(0xFFa85147)),
           body2: TextStyle(color: Colors.red),//TextStyle(color: Color(0xFFa85147)),
           title: TextStyle(color: Color(0xFFa85147)),
           subhead: TextStyle(color: Color(0xFFd6ceb9)),
