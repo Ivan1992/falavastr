@@ -32,9 +32,8 @@ class DateService {
     if (today.isBefore(p)) {
       p = pasha(year - 1);
     }
-    // print(">>>>>>>>TODAY=$today PASHa=$p");
+
     int r = (((today.millisecondsSinceEpoch - p.millisecondsSinceEpoch).abs()) / (7*24*60*60*1000)).round();
-    print("r=$r");
     return (r%8) + 1;
   }
 
