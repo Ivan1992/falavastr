@@ -74,13 +74,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.3+1"
-  material_switch:
-    dependency: "direct main"
-    description:
-      name: material_switch
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.9"
   meta:
     dependency: transitive
     description:
@@ -102,6 +95,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.20.0"
   scoped_model:
     dependency: "direct main"
     description:
@@ -178,5 +178,5 @@ packages:
     source: hosted
     version: "2.0.8"
 sdks:
-  dart: ">=2.0.0 <=2.1.0-dev.9.4.flutter-f9ebf21297"
+  dart: ">=2.0.0 <3.0.0"
   flutter: ">=0.1.4 <2.0.0"

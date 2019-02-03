@@ -24,14 +24,23 @@ class _CsText extends State<CsText> {
 
   _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _fontSize = prefs.getDouble("fontSize") ?? 2.0;
-    _fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
+    setState(() {
+      _fontSize = prefs.getDouble("fontSize") ?? 2.0;
+      _fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
+    });
+  }
+
+  _savePreferences(ScaleEndDetails _) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("fontSize", _fontSize);
   }
 
   List<Widget> _parseText(String text) {
     List<Widget> toReturn = [];
     if (!text.contains(r"<r>")) {
-      toReturn.add(RichText(text: TextSpan(text: text)));
+      toReturn.add(RichText(
+          text:
+              TextSpan(text: text, style: TextStyle(fontFamily: _fontFamily))));
       return toReturn;
     }
 
@@ -115,11 +124,12 @@ class _CsText extends State<CsText> {
 
   @override
   Widget build(BuildContext context) {
-     //final ScrollController _controller
+    //final ScrollController _controller
 
     return GestureDetector(
       onScaleStart: _handleOnScaleStart,
       onScaleUpdate: _handleScaleUpdate,
+      onScaleEnd: _savePreferences,
       child: DraggableScrollbar.semicircle(
         backgroundColor: Theme.of(context).accentColor,
         child: ListView(

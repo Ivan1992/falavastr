@@ -28,12 +28,12 @@ class DateService {
   static int glas(DateTime today) {
     int year = today.year;
     DateTime p = pasha(year);
-    today = today.subtract(Duration(days: 7));
+    today = today.subtract(Duration(days: 6));
     if (today.isBefore(p)) {
       p = pasha(year - 1);
     }
 
-    int r = (((today.millisecondsSinceEpoch - p.millisecondsSinceEpoch).abs()) / (7*24*60*60*1000)).round();
+    int r = ((( (today.subtract(Duration(days: today.weekday-1))).millisecondsSinceEpoch - p.millisecondsSinceEpoch).abs()) / (7*24*60*60*1000)).round();
     return (r%8) + 1;
   }
 

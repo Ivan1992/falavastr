@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 class UstavPage extends StatefulWidget {
   final String name;
   final DayText day;
+  final int initialPart;
 
-  UstavPage(this.name, this.day);
+  UstavPage(this.name, this.day, [this.initialPart = 0]);
 
   @override
   State<StatefulWidget> createState() => _UstavPageState();
@@ -28,7 +29,7 @@ class _UstavPageState extends State<UstavPage> {
   @override
   void initState() {
     super.initState();
-    _cstext = CsText(widget.day.sluzhby[0].parts[0].text, controller);
+    _cstext = CsText(widget.day.sluzhby[0].parts[widget.initialPart].text, controller);
   }
 
   void _showDialog() {

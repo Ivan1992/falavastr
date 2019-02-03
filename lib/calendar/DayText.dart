@@ -52,6 +52,7 @@ class DayTextService {
       case TEXTTYPE.APOSTOL:
       case TEXTTYPE.OKTAY:
         jsonString = await _load(_oktay);
+        day = day.add(Duration(days: 13)); //Calculate Oktay only based on new-stlye dates
         d = DayText.oktay(json.decode(jsonString), DateService.glas(day), day.weekday);
         d.today = day;
         return d;
@@ -71,6 +72,10 @@ class DayText {
   DateTime today;
 
   DayText({this.title, this.sluzhby});
+
+  factory DayText.empty() {
+    return DayText(sluzhby: [], title: "empty");
+  }
 
   factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {
     /*
