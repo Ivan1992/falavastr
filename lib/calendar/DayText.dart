@@ -48,15 +48,15 @@ class DayTextService {
         d.today = day;
         return d;
 
-      case TEXTTYPE.EVANGELIE:
-      case TEXTTYPE.APOSTOL:
+      //case TEXTTYPE.EVANGELIE:
+      //case TEXTTYPE.APOSTOL:
       case TEXTTYPE.OKTAY:
         jsonString = await _load(_oktay);
         day = day.add(Duration(days: 13)); //Calculate Oktay only based on new-stlye dates
         d = DayText.oktay(json.decode(jsonString), DateService.glas(day), day.weekday);
         d.today = day;
         return d;
-      case TEXTTYPE.TRIOD:
+      //case TEXTTYPE.TRIOD:
 
       default:
         return null;
@@ -64,7 +64,8 @@ class DayTextService {
   }
 }
 
-enum TEXTTYPE { SVYATCY, EVANGELIE, APOSTOL, MINEA, OKTAY, TRIOD }
+//enum TEXTTYPE { SVYATCY, EVANGELIE, APOSTOL, MINEA, OKTAY, TRIOD }
+enum TEXTTYPE { SVYATCY, MINEA, OKTAY  }
 
 class DayText {
   final String title;
@@ -77,12 +78,7 @@ class DayText {
     return DayText(sluzhby: [], title: "empty");
   }
 
-  factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {
-    /*
-    var glasy = /<c><r>конeцъ .*? глaсу\.<\/r><\/c>/gi;	
-    var glasySplit = contents.split(glasy);
-    var day = /\r\nВ<r>. ?.*? вeчеръ/gi; */
-    
+  factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {    
     var glasObj = parsedJson[glas-1]["text"][(weekday+1) % 7];
     List<Sluzhba> sluzhby = List()..add(Sluzhba.oktay(glasObj));
     return DayText(sluzhby: sluzhby, title: "Октай");
@@ -101,7 +97,7 @@ class DayText {
     List<Sluzhba> sluzhby = list.map((i) => Sluzhba.minea(i)).toList();
 
     return DayText(
-      title: parsedJson[day]['title'],
+      title: "Минея",//parsedJson[day]['title'],
       sluzhby: sluzhby,
     );
   }

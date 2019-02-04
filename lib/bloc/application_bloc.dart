@@ -1,25 +1,51 @@
 import 'dart:async';
+import 'dart:collection';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:rxdart/rxdart.dart';
 
-
 class ApplicationBloc implements BlocBase {
+  List<DayText> _infoPage = [];
 
-  DayText _dayText;
-  
-  BehaviorSubject<DayText> _dayTextController = BehaviorSubject<DayText>();
-  Sink<DayText> get _inDayTextController => _dayTextController.sink;
-  Stream<DayText> get outDayTextController => _dayTextController.stream;
+  BehaviorSubject<List<DayText>> _infoPageController =
+      BehaviorSubject<List<DayText>>();
+  StreamSink<List<DayText>> get _inInfoPage => _infoPageController.sink;
+  Stream<List<DayText>> get outInfoPage => _infoPageController.stream;
 
+  StreamController _changeDateController = StreamController();
+  StreamSink get changeDate => _changeDateController.sink;
 
   ApplicationBloc() {
-    DayTextService.getDayText(DateTime.now(), TEXTTYPE.SVYATCY).then( (day) => _dayText = day);
-    _inDayTextController.add(_dayText);
+    _apiInfoDay().then((_) {
+      _inInfoPage.add(UnmodifiableListView(_infoPage));
+    });
+    /* DayTextService.getDayText(DateTime.now(), TEXTTYPE.SVYATCY).then((day) {
+      _infoPage.add(day);
+    }); */
+
+    /* _infoPage.forEach((x) {
+      print(">>>>>>>>${x.title}");
+    }); */
+    _changeDateController.stream.listen(_handeChangeDate);
   }
 
-  void dispose(){
-    _dayTextController.close();
+  Future<Null> _apiInfoDay() async {
+    _infoPage = [];
+    TEXTTYPE.values.forEach((type) async {
+      await DayTextService.getDayText(DateTime.now(), type).then( (day) => _infoPage.add(day));
+    });
   }
- 
+
+  _handeChangeDate(data) {
+    _infoPage = [];
+    TEXTTYPE.values.forEach((type) {
+      DayTextService.getDayText(data, type).then((day) => _infoPage.add(day));
+    });
+    _inInfoPage.add(UnmodifiableListView(_infoPage));
+  }
+
+  void dispose() {
+    _infoPageController.close();
+    _changeDateController.close();
+  }
 }
