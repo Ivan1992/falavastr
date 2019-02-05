@@ -17,7 +17,8 @@ class ApplicationBloc implements BlocBase {
 
   ApplicationBloc() {
     _apiInfoDay().then((_) {
-      _inInfoPage.add(UnmodifiableListView(_infoPage));
+      print("FINISHED");
+      //_inInfoPage.add(UnmodifiableListView(_infoPage));
     });
     /* DayTextService.getDayText(DateTime.now(), TEXTTYPE.SVYATCY).then((day) {
       _infoPage.add(day);
@@ -30,10 +31,11 @@ class ApplicationBloc implements BlocBase {
   }
 
   Future<Null> _apiInfoDay() async {
-    _infoPage = [];
+    //_infoPage = [];
     TEXTTYPE.values.forEach((type) async {
       await DayTextService.getDayText(DateTime.now(), type).then( (day) => _infoPage.add(day));
     });
+    _inInfoPage.add(UnmodifiableListView(_infoPage));
   }
 
   _handeChangeDate(data) {
