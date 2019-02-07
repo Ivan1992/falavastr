@@ -8,16 +8,19 @@ class SmartSwitch extends StatefulWidget {
 }
 
 class _SmartSwitchState extends State<SmartSwitch> {
-
   bool toggle = false;
+  GlobalKey _keyLeft = GlobalKey();
+  GlobalKey _keyRight = GlobalKey();
   Offset position = Offset(0.0, 0.0);
+  double containerWidth = 170.0;
+  double buttonWidth = 90.0;
+  double height = 30.0;
 
   @override
   Widget build(BuildContext context) {
-
     Widget obj = Container(
-      height: 40.0,
-      width: 100.0,
+      height: height,
+      width: buttonWidth,
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(200),
         borderRadius: BorderRadius.all(
@@ -25,10 +28,45 @@ class _SmartSwitchState extends State<SmartSwitch> {
         ),
       ),
     );
+
+    var knopochka = Positioned(
+      left: position.dx,
+      top: position.dy,
+      child: GestureDetector(
+        onPanEnd: (details) {
+          if (position.dx < (containerWidth / 2 - buttonWidth / 2)) {
+            final RenderBox _renderBox =
+                _keyLeft.currentContext.findRenderObject();
+            setState(() {
+              buttonWidth = _renderBox.size.width + 40;
+              position = Offset(0.0, position.dy);
+            });
+          } else {
+            final RenderBox _renderBox =
+                _keyRight.currentContext.findRenderObject();
+            setState(() {
+              buttonWidth = _renderBox.size.width + 40;
+              position = Offset(containerWidth - buttonWidth, position.dy);
+            });
+          }
+        },
+        onPanUpdate: (details) {
+          if ((position.dx + details.delta.dx) <
+                  (containerWidth - buttonWidth) &&
+              (position.dx + details.delta.dx) > 0) {
+            setState(() {
+              position = Offset(position.dx + details.delta.dx, position.dy);
+            });
+          }
+        },
+        child: obj,
+      ),
+    );
+
     return SizedBox(
-      width: 250.0,
+      width: containerWidth,
       child: Container(
-          height: 40.0,
+          height: height,
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.all(
@@ -40,46 +78,55 @@ class _SmartSwitchState extends State<SmartSwitch> {
             alignment: AlignmentDirectional.center,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  DragTarget(
-                    builder: (BuildContext context, List candidateData,
-                        List rejectedData) {
-                      return Container(
-                        color: Colors.pink,
-                        child: Text("старый"),
-                      );
-                    },
-                    onAccept: (data) => print("accepted"),
-                    onWillAccept: (data) => false,
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Text(
+                      "старый",
+                      key: _keyLeft,
+                    ),
                   ),
-                  Text("новый")
+                  Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Text(
+                      "новый",
+                      key: _keyRight,
+                    ),
+                  ),
                 ],
               ),
+              knopochka,
               Positioned(
+                left: containerWidth / 2,
+                top: 0.0,
+                child: Container(width: 2.0, height: 20.0, color: Colors.pink),
+              )
+              /* Positioned(
                 left: position.dx,
                 top: position.dy,
                 child: Draggable(
-                onDragCompleted: () {
-                  print("completed");
-                  setState(() {
-                    //finished = true;
-                  });
-                },
-                onDraggableCanceled: (velocity, offset) {
-                  setState(() {
-                    position = Offset(offset.dx, position.dy);//toggle ? Offset(position.dx+100.0, position.dy) :  Offset(position.dx-100.0, position.dy); 
-                    //toggle = !toggle;
-                    print(offset.toString()+" "+position.toString());
-                  });
-                },
-                feedback: obj,
-                axis: Axis.horizontal,
-                childWhenDragging: Container(),
-                child: obj,
-              ),
-              )
+                  onDragCompleted: () {
+                    print("completed");
+                    setState(() {});
+                  },
+                  onDraggableCanceled: (velocity, offset) {
+                    setState(() {
+                      position = Offset(
+                          offset.dx,
+                          position
+                              .dy); //toggle ? Offset(position.dx+100.0, position.dy) :  Offset(position.dx-100.0, position.dy);
+                      //toggle = !toggle;
+                      print(offset.toString() + " " + position.toString());
+                    });
+                  },
+                  feedback: obj,
+                  axis: Axis.horizontal,
+                  childWhenDragging: Container(),
+                  child: obj,
+                ),
+              ), */
             ],
           )),
     );
