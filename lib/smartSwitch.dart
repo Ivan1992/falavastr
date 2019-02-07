@@ -84,24 +84,62 @@ class _SmartSwitchState extends State<SmartSwitch> {
       ),
     );
 
+    var row = (Widget child) => GestureDetector(
+          onPanStart: (details) {
+            setState(() {
+              buttonColor = originalColor.withAlpha(150);
+            });
+          },
+          onPanEnd: (details) {
+            if (position.dx < (containerWidth / 2 - buttonWidth / 2)) {
+              final RenderBox _renderBox =
+                  _keyLeft.currentContext.findRenderObject();
+              setState(() {
+                //buttonWidth = _renderBox.size.width + 40;
+                position = Offset(0.0, position.dy);
+                _toggle = false;
+                buttonColor = originalColor.withAlpha(100);
+              });
+            } else {
+              final RenderBox _renderBox =
+                  _keyRight.currentContext.findRenderObject();
+              setState(() {
+                //buttonWidth = _renderBox.size.width + 40;
+                position = Offset(containerWidth - buttonWidth, position.dy);
+                _toggle = true;
+                buttonColor = originalColor.withAlpha(100);
+              });
+            }
+          },
+          onPanUpdate: (details) {
+            if ((position.dx + details.delta.dx) <
+                    (containerWidth - buttonWidth) &&
+                (position.dx + details.delta.dx) > 0) {
+              setState(() {
+                position = Offset(position.dx + details.delta.dx, position.dy);
+              });
+            }
+          },
+          child: child,
+        );
+
     return SizedBox(
       width: containerWidth,
-      child: GestureDetector(
-        behavior: HitTestBehavior.deferToChild,
-        child: Container(
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.all(
-              Radius.circular(20.0),
-            ),
-            //border: Border.all(color: Colors.white, width: 1.0),
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
           ),
-          child: Stack(
-            overflow: Overflow.visible,
-            alignment: AlignmentDirectional.center,
-            children: <Widget>[
-              //knopochka,
+          //border: Border.all(color: Colors.white, width: 1.0),
+        ),
+        child: Stack(
+          overflow: Overflow.visible,
+          alignment: AlignmentDirectional.center,
+          children: <Widget>[
+            knopochka,
+            row(
               Container(
                 height: 30.0,
                 color: Colors.pink,
@@ -124,8 +162,9 @@ class _SmartSwitchState extends State<SmartSwitch> {
                   ],
                 ),
               ),
-              knopochka,
-              /* Row(
+            ),
+            //knopochka,
+            /* Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -139,8 +178,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
                   ),
                 ],
               ), */
-            ],
-          ),
+          ],
         ),
       ),
     );
