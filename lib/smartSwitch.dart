@@ -8,13 +8,25 @@ class SmartSwitch extends StatefulWidget {
 }
 
 class _SmartSwitchState extends State<SmartSwitch> {
-  bool toggle = false;
+  bool _toggle = false;
   GlobalKey _keyLeft = GlobalKey();
   GlobalKey _keyRight = GlobalKey();
   Offset position = Offset(0.0, 0.0);
-  double containerWidth = 170.0;
-  double buttonWidth = 90.0;
-  double height = 30.0;
+  double containerWidth;
+  double buttonWidth;
+  double height;
+  Color originalColor = Colors.white;
+  Color buttonColor;
+
+  @override
+  void initState() {
+    super.initState();
+    containerWidth = 270.0;
+    buttonWidth = containerWidth / 2;
+    height = 50.0;
+    originalColor = Colors.white;
+    buttonColor = originalColor.withAlpha(100);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +34,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
       height: height,
       width: buttonWidth,
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(200),
+        color: Colors.lime, //buttonColor,
         borderRadius: BorderRadius.all(
           Radius.circular(20.0),
         ),
@@ -33,20 +45,29 @@ class _SmartSwitchState extends State<SmartSwitch> {
       left: position.dx,
       top: position.dy,
       child: GestureDetector(
+        onPanStart: (details) {
+          setState(() {
+            buttonColor = originalColor.withAlpha(150);
+          });
+        },
         onPanEnd: (details) {
           if (position.dx < (containerWidth / 2 - buttonWidth / 2)) {
             final RenderBox _renderBox =
                 _keyLeft.currentContext.findRenderObject();
             setState(() {
-              buttonWidth = _renderBox.size.width + 40;
+              //buttonWidth = _renderBox.size.width + 40;
               position = Offset(0.0, position.dy);
+              _toggle = false;
+              buttonColor = originalColor.withAlpha(100);
             });
           } else {
             final RenderBox _renderBox =
                 _keyRight.currentContext.findRenderObject();
             setState(() {
-              buttonWidth = _renderBox.size.width + 40;
+              //buttonWidth = _renderBox.size.width + 40;
               position = Offset(containerWidth - buttonWidth, position.dy);
+              _toggle = true;
+              buttonColor = originalColor.withAlpha(100);
             });
           }
         },
@@ -65,70 +86,63 @@ class _SmartSwitchState extends State<SmartSwitch> {
 
     return SizedBox(
       width: containerWidth,
-      child: Container(
+      child: GestureDetector(
+        behavior: HitTestBehavior.deferToChild,
+        child: Container(
           height: height,
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.all(
               Radius.circular(20.0),
             ),
-            border: Border.all(color: Colors.white, width: 1.0),
+            //border: Border.all(color: Colors.white, width: 1.0),
           ),
           child: Stack(
+            overflow: Overflow.visible,
             alignment: AlignmentDirectional.center,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
+              //knopochka,
+              Container(
+                height: 30.0,
+                color: Colors.pink,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
                       "старый",
                       key: _keyLeft,
+                      style: TextStyle(
+                          color: !_toggle
+                              ? Theme.of(context).textTheme.display1.color
+                              : Colors.transparent),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 10.0),
-                    child: Text(
+                    Text(
                       "новый",
                       key: _keyRight,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               knopochka,
-              Positioned(
-                left: containerWidth / 2,
-                top: 0.0,
-                child: Container(width: 2.0, height: 20.0, color: Colors.pink),
-              )
-              /* Positioned(
-                left: position.dx,
-                top: position.dy,
-                child: Draggable(
-                  onDragCompleted: () {
-                    print("completed");
-                    setState(() {});
-                  },
-                  onDraggableCanceled: (velocity, offset) {
-                    setState(() {
-                      position = Offset(
-                          offset.dx,
-                          position
-                              .dy); //toggle ? Offset(position.dx+100.0, position.dy) :  Offset(position.dx-100.0, position.dy);
-                      //toggle = !toggle;
-                      print(offset.toString() + " " + position.toString());
-                    });
-                  },
-                  feedback: obj,
-                  axis: Axis.horizontal,
-                  childWhenDragging: Container(),
-                  child: obj,
-                ),
+              /* Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "старый",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                  Text(
+                    "новый",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ],
               ), */
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }
