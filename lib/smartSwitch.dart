@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SmartSwitch extends StatefulWidget {
+  const SmartSwitch({Key key, this.onChange, this.beginState=true}) : super(key: key);
+
+  final ValueChanged<bool> onChange;
+  final bool beginState;
+
   @override
   State<StatefulWidget> createState() {
     return _SmartSwitchState();
@@ -8,33 +13,64 @@ class SmartSwitch extends StatefulWidget {
 }
 
 class _SmartSwitchState extends State<SmartSwitch> {
-  bool _toggle = false;
   GlobalKey _keyLeft = GlobalKey();
   GlobalKey _keyRight = GlobalKey();
-  Offset position = Offset(0.0, 0.0);
-  double containerWidth;
-  double buttonWidth;
-  double height;
-  Color originalColor = Colors.white;
-  Color buttonColor;
+  Offset _position;
+  double _containerWidth;
+  double _buttonWidth;
+  double _height;
+  Color _originalColor = Colors.white;
+  Color _buttonColor;
 
   @override
   void initState() {
     super.initState();
-    containerWidth = 170.0;
-    buttonWidth = containerWidth / 2;
-    height = 30.0;
-    originalColor = Colors.white;
-    buttonColor = originalColor.withAlpha(100);
+    _containerWidth = 170.0;
+    _buttonWidth = _containerWidth / 2;
+    _height = 30.0;
+    _originalColor = Colors.white;
+    _buttonColor = _originalColor;
+    _position = Offset(widget.beginState? (_containerWidth - _buttonWidth) : 0.0, 0.0);
+  }
+
+  void _switch(bool val) {
+    if (!val) {
+      setState(() {
+        _position = Offset(0.0, _position.dy);
+        widget.onChange(false);
+      });
+    } else {
+      setState(() {
+        _position = Offset(_containerWidth - _buttonWidth, _position.dy);
+        widget.onChange(true);
+      });
+    }
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    if (_position.dx < (_containerWidth / 2 - _buttonWidth / 2)) {
+      _switch(false);
+    } else {
+      _switch(true);
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if ((_position.dx + details.delta.dx) < (_containerWidth - _buttonWidth) &&
+        (_position.dx + details.delta.dx) > 0) {
+      setState(() {
+        _position = Offset(_position.dx + details.delta.dx, _position.dy);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Widget obj = Container(
-      height: height,
-      width: buttonWidth,
+      height: _height,
+      width: _buttonWidth,
       decoration: BoxDecoration(
-        color: buttonColor,
+        color: _buttonColor,
         borderRadius: BorderRadius.all(
           Radius.circular(20.0),
         ),
@@ -42,97 +78,30 @@ class _SmartSwitchState extends State<SmartSwitch> {
     );
 
     var knopochka = Positioned(
-      left: position.dx,
-      top: position.dy,
-      child: GestureDetector(
-        onPanStart: (details) {
-          setState(() {
-            buttonColor = originalColor.withAlpha(150);
-          });
-        },
-        onPanEnd: (details) {
-          if (position.dx < (containerWidth / 2 - buttonWidth / 2)) {
-            final RenderBox _renderBox =
-                _keyLeft.currentContext.findRenderObject();
-            setState(() {
-              //buttonWidth = _renderBox.size.width + 40;
-              position = Offset(0.0, position.dy);
-              _toggle = false;
-              buttonColor = originalColor.withAlpha(100);
-            });
-          } else {
-            final RenderBox _renderBox =
-                _keyRight.currentContext.findRenderObject();
-            setState(() {
-              //buttonWidth = _renderBox.size.width + 40;
-              position = Offset(containerWidth - buttonWidth, position.dy);
-              _toggle = true;
-              buttonColor = originalColor.withAlpha(100);
-            });
-          }
-        },
-        onPanUpdate: (details) {
-          if ((position.dx + details.delta.dx) <
-                  (containerWidth - buttonWidth) &&
-              (position.dx + details.delta.dx) > 0) {
-            setState(() {
-              position = Offset(position.dx + details.delta.dx, position.dy);
-            });
-          }
-        },
-        child: obj,
-      ),
-    );
+        left: _position.dx,
+        top: _position.dy,
+        child: GestureDetector(
+          onPanEnd: _onPanEnd,
+          onPanUpdate: _onPanUpdate,
+          child: obj,
+        ),
+      );
 
     var row = (Widget child) => GestureDetector(
-          onPanStart: (details) {
-            setState(() {
-              buttonColor = originalColor.withAlpha(150);
-            });
-          },
-          onPanEnd: (details) {
-            if (position.dx < (containerWidth / 2 - buttonWidth / 2)) {
-              final RenderBox _renderBox =
-                  _keyLeft.currentContext.findRenderObject();
-              setState(() {
-                //buttonWidth = _renderBox.size.width + 40;
-                position = Offset(0.0, position.dy);
-                _toggle = false;
-                buttonColor = originalColor.withAlpha(100);
-              });
-            } else {
-              final RenderBox _renderBox =
-                  _keyRight.currentContext.findRenderObject();
-              setState(() {
-                //buttonWidth = _renderBox.size.width + 40;
-                position = Offset(containerWidth - buttonWidth, position.dy);
-                _toggle = true;
-                buttonColor = originalColor.withAlpha(100);
-              });
-            }
-          },
-          onPanUpdate: (details) {
-            if ((position.dx + details.delta.dx) <
-                    (containerWidth - buttonWidth) &&
-                (position.dx + details.delta.dx) > 0) {
-              setState(() {
-                position = Offset(position.dx + details.delta.dx, position.dy);
-              });
-            }
-          },
+          onPanEnd: _onPanEnd,
+          onPanUpdate: _onPanUpdate,
           child: child,
         );
 
     return SizedBox(
-      width: containerWidth,
+      width: _containerWidth,
       child: Container(
-        height: height,
+        height: _height,
         decoration: BoxDecoration(
           color: Colors.black,
           borderRadius: BorderRadius.all(
             Radius.circular(20.0),
           ),
-          //border: Border.all(color: Colors.white, width: 1.0),
         ),
         child: Stack(
           overflow: Overflow.visible,
@@ -144,36 +113,43 @@ class _SmartSwitchState extends State<SmartSwitch> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    "старый",
-                    key: _keyLeft,
-                    /* style: TextStyle(
-                        color: !_toggle
-                            ? Theme.of(context).textTheme.body1.color
-                            : Colors.transparent), */
+                  GestureDetector(
+                    onTap: () {
+                      _switch(false);
+                    },
+                    child: Text("старый", key: _keyLeft),
                   ),
-                  Text(
-                    "новый",
-                    key: _keyRight,
+                  GestureDetector(
+                    onTap: () {
+                      _switch(true);
+                    },
+                    child: Text("новый", key: _keyRight),
                   ),
                 ],
+                /* children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      _switch(false);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: _height,
+                      child: Text("старый", key: _keyLeft),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _switch(true);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: _height,
+                      child: Text("новый", key: _keyRight),
+                    ),
+                  ),
+                ], */
               ),
             ),
-            //knopochka,
-            /* Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "старый",
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                  Text(
-                    "новый",
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ],
-              ), */
           ],
         ),
       ),

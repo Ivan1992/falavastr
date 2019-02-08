@@ -43,7 +43,9 @@ class MyApp extends StatelessWidget {
         ),
         brightness: Brightness.dark,
       ),
-      home: InfoPage(today: DateTime.now()), //MainCollapsingToolbar(),
+      home: InfoPage(
+        today: DateTime.now(),
+      ), //MainCollapsingToolbar(),
     );
   }
 }

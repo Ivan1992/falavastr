@@ -9,16 +9,6 @@ import 'package:falavastr/smartSwitch.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'dart:async' show Future;
-
-/* class InfoPage extends StatefulWidget {
-  final DateTime today;
-
-  InfoPage({this.today});
-
-  @override
-  State<StatefulWidget> createState() => InfoPageState();
-} */
 
 class InfoPage extends StatefulWidget {
   final DateTime today;
@@ -31,8 +21,36 @@ class InfoPage extends StatefulWidget {
   State<StatefulWidget> createState() => _InfoPageState();
 }
 
-class _InfoPageState extends State<InfoPage> {
-  bool newStyle = true;
+class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
+  bool _newStyle = true;
+  AnimationController controller;
+  Animation animation;
+  Animation curve;
+
+  String _month;
+  String _weekday;
+  String _name;
+  String _glas;
+  DateTime today;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
+    curve = CurvedAnimation(parent: controller, curve: Curves.easeOut);
+
+    today =
+        _newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
+    _month = DateFormat("MMMM", "ru").format(today);
+    _name = DateFormat("dd.MM.yyyy", "ru").format(today);
+    _weekday = DateFormat("EEEE", "ru").format(widget.today);
+    _glas = DateService.glasString(widget.today);
+
+    animation = IntTween(begin: 0, end: today.day).animate(curve);
+    controller.forward();
+  }
 
   Widget _card(DayText d) {
     List<Widget> _options = [];
@@ -40,28 +58,36 @@ class _InfoPageState extends State<InfoPage> {
     if (d.sluzhby[0].parts.length > 1) {
       var parts = d.sluzhby[0].parts;
       for (var i = 0; i < parts.length; i++) {
-        _options.add(Padding(
-          padding: EdgeInsets.all(5.0),
-          child: RaisedButton(
-            onPressed: () async {
-              /* DayText d2 = await DayTextService.getDayText(
-                  widget.today.subtract(Duration(days: 13)), ); */
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (ctxt) => UstavPage(d.title, d, i),
-                ),
-              );
-            },
-            child: Text(parts[i].name),
-          ),
-        ));
+        _options.add(Container(
+            height: 40.0,
+            padding: EdgeInsets.symmetric(vertical: 0.5),
+            child: SizedBox.expand(
+              child: OutlineButton(
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctxt) => UstavPage(d.title, d, i),
+                    ),
+                  );
+                },
+                child: Padding(
+                    padding: EdgeInsets.only(bottom: 0.0),
+                    child: Text(parts[i].name)),
+              ),
+            )));
       }
       toReturn = Padding(
         padding: EdgeInsets.symmetric(horizontal: 40.0),
         child: Card(
           child: ExpansionTile(
-            title: Text(d.title),
+            title: Hero(
+              tag: d.title,
+              child: Material(
+                color: Colors.transparent,
+                child: Text(d.title),
+              ),
+            ),
             children: _options,
           ),
         ),
@@ -81,7 +107,13 @@ class _InfoPageState extends State<InfoPage> {
                 ),
               );
             },
-            title: Text(d.title),
+            title: Hero(
+              tag: d.title,
+              child: Material(
+                color: Colors.transparent,
+                child: Text(d.title),
+              ),
+            ),
           ),
         ),
       );
@@ -92,15 +124,6 @@ class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-    //appBloc.updateInfoPage.add(null);
-
-    List<String> switchOptions = ["старый", "новый"];
-    DateTime today =
-        newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
-    String _month = DateFormat("MMMM", "ru").format(today);
-    String _weekday = DateFormat("EEEE", "ru").format(widget.today);
-    String _name = DateFormat("Md", "ru").format(today);
-    String _glas = DateService.glasString(widget.today);
 
     return Scaffold(
       drawer: DrawerOnly(),
@@ -123,39 +146,83 @@ class _InfoPageState extends State<InfoPage> {
           stream: appBloc.outInfoPage,
           builder:
               (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
-            
-            return Column(
-              children: <Widget>[
-                Text(
-                  "${today.day}",
-                  textScaleFactor: 6.0,
-                ),
-                Text(_month, textScaleFactor: 2.0),
-                Text(_weekday, textScaleFactor: 2.0),
-                SmartSwitch(),
-                Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+            return AnimatedBuilder(
+                animation: controller,
+                builder: (BuildContext context, Widget child) {
+                  return Column(
                     children: <Widget>[
-                      Text("Глас $_glas"),
-                      Text("пища с рыбой"),
+                      Text(
+                        animation.value.toString(),
+                        textScaleFactor: 6.0,
+                      ),
+                      Text(_month, textScaleFactor: 2.0),
+                      Text(_weekday, textScaleFactor: 2.0),
+                      SmartSwitch(
+                        onChange: (val) {
+                          setState(() {
+                            _newStyle = val;
+                            _animate(val);
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Text("Глас $_glas"),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                IconButton(
+                                  icon: Icon(Icons.info),
+                                  onPressed: () {},
+                                ),
+                                Text("пища с рыбой"),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: snapshot.hasData //
+                              ? snapshot.data.map((x) => _card(x)).toList()
+                              : [CircularProgressIndicator()],
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: snapshot.hasData //
-                        ? (snapshot.data != null && snapshot.data.length > 0)
-                            ? snapshot.data.map((x) => _card(x)).toList()
-                            : [Text("Got 0 length data:${snapshot.toString()}")]
-                        : [Text("loading...")],
-                  ),
-                ),
-              ],
-            );
+                  );
+                });
           }),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _animate(bool val) {
+    int begin, end;
+    if (val) {
+      begin = widget.today.subtract(Duration(days: 13)).day;
+      end = widget.today.day;
+      today = widget.today;
+    } else {
+      begin = widget.today.day;
+      end = widget.today.subtract(Duration(days: 13)).day;
+      today = widget.today.subtract(Duration(days: 13));
+    }
+    controller.reset();
+    /* curve = CurvedAnimation(
+                                parent: controller, curve: Curves.easeOut); */
+    animation = IntTween(begin: begin, end: end).animate(curve);
+    controller.forward();
+    _month = DateFormat("MMMM", "ru").format(today);
+    _name = DateFormat("dd.MM.yyyy", "ru").format(today);
   }
 }

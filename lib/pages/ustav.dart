@@ -20,7 +20,8 @@ class _UstavPageState extends State<UstavPage> {
   CsText _cstext;
   int _currentSluzhba = 0;
   bool _fullscreen = false;
-  final ScrollController controller = ScrollController(initialScrollOffset: 0.0);
+  final ScrollController controller =
+      ScrollController(initialScrollOffset: 0.0);
 
   void showMenuSelection(String value) {
     print('You selected: $value');
@@ -29,7 +30,8 @@ class _UstavPageState extends State<UstavPage> {
   @override
   void initState() {
     super.initState();
-    _cstext = CsText(widget.day.sluzhby[0].parts[widget.initialPart].text, controller);
+    _cstext = CsText(
+        widget.day.sluzhby[0].parts[widget.initialPart].text, controller);
   }
 
   void _showDialog() {
@@ -118,7 +120,13 @@ class _UstavPageState extends State<UstavPage> {
         floatingActionButton: !_fullscreen ? fab : null,
         appBar: !_fullscreen
             ? AppBar(
-                title: Text(widget.name),
+                title: Hero(
+                  tag: widget.name,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(widget.name, style: Theme.of(context).textTheme.caption.copyWith(fontSize: 20.0),),
+                  ), 
+                ),
                 actions: <Widget>[
                   PopupMenuButton<String>(
                       icon: Icon(Icons.format_size),
