@@ -21,9 +21,9 @@ class _SmartSwitchState extends State<SmartSwitch> {
   @override
   void initState() {
     super.initState();
-    containerWidth = 270.0;
+    containerWidth = 170.0;
     buttonWidth = containerWidth / 2;
-    height = 50.0;
+    height = 30.0;
     originalColor = Colors.white;
     buttonColor = originalColor.withAlpha(100);
   }
@@ -34,7 +34,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
       height: height,
       width: buttonWidth,
       decoration: BoxDecoration(
-        color: Colors.lime, //buttonColor,
+        color: buttonColor,
         borderRadius: BorderRadius.all(
           Radius.circular(20.0),
         ),
@@ -140,27 +140,23 @@ class _SmartSwitchState extends State<SmartSwitch> {
           children: <Widget>[
             knopochka,
             row(
-              Container(
-                height: 30.0,
-                color: Colors.pink,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "старый",
-                      key: _keyLeft,
-                      style: TextStyle(
-                          color: !_toggle
-                              ? Theme.of(context).textTheme.display1.color
-                              : Colors.transparent),
-                    ),
-                    Text(
-                      "новый",
-                      key: _keyRight,
-                    ),
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "старый",
+                    key: _keyLeft,
+                    /* style: TextStyle(
+                        color: !_toggle
+                            ? Theme.of(context).textTheme.body1.color
+                            : Colors.transparent), */
+                  ),
+                  Text(
+                    "новый",
+                    key: _keyRight,
+                  ),
+                ],
               ),
             ),
             //knopochka,

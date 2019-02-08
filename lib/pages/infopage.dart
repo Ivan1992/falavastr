@@ -92,6 +92,7 @@ class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+    //appBloc.updateInfoPage.add(null);
 
     List<String> switchOptions = ["старый", "новый"];
     DateTime today =

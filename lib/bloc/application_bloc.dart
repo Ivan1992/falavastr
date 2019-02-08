@@ -15,10 +15,13 @@ class ApplicationBloc implements BlocBase {
   StreamController _changeDateController = StreamController();
   StreamSink get changeDate => _changeDateController.sink;
 
+  StreamController _updateInfoPage = StreamController();
+  StreamSink get updateInfoPage => _updateInfoPage.sink;
+
   ApplicationBloc() {
     _apiInfoDay().then((_) {
       print("FINISHED");
-      //_inInfoPage.add(UnmodifiableListView(_infoPage));
+      _inInfoPage.add(UnmodifiableListView(_infoPage));
     });
     /* DayTextService.getDayText(DateTime.now(), TEXTTYPE.SVYATCY).then((day) {
       _infoPage.add(day);
@@ -28,10 +31,18 @@ class ApplicationBloc implements BlocBase {
       print(">>>>>>>>${x.title}");
     }); */
     _changeDateController.stream.listen(_handeChangeDate);
+    _updateInfoPage.stream.listen(_handleUpdateInfoPage);
+  }
+
+  _handleUpdateInfoPage(_) async {
+    await _apiInfoDay();
   }
 
   Future<Null> _apiInfoDay() async {
     //_infoPage = [];
+    for (var i=0; i < TEXTTYPE.values.length; i++) {
+      _infoPage.add(await DayTextService.getDayText(DateTime.now(), TEXTTYPE.values[i]));
+    }
     TEXTTYPE.values.forEach((type) async {
       await DayTextService.getDayText(DateTime.now(), type).then( (day) => _infoPage.add(day));
     });
@@ -49,5 +60,6 @@ class ApplicationBloc implements BlocBase {
   void dispose() {
     _infoPageController.close();
     _changeDateController.close();
+    _updateInfoPage.close();
   }
 }
