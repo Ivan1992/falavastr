@@ -124,6 +124,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+    appBloc.changeDate.add(widget.today);
 
     return Scaffold(
       drawer: DrawerOnly(),
@@ -153,7 +154,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                     children: <Widget>[
                       Text(
                         animation.value.toString(),
-                        textScaleFactor: 6.0,
+                        textScaleFactor: 5.0,
                       ),
                       Text(_month, textScaleFactor: 2.0),
                       Text(_weekday, textScaleFactor: 2.0),
@@ -187,10 +188,11 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                         ),
                       ),
                       Expanded(
-                        child: Column(
-                          children: snapshot.hasData //
+                        child: ListView(
+                          physics: BouncingScrollPhysics(),
+                          children: snapshot.hasData
                               ? snapshot.data.map((x) => _card(x)).toList()
-                              : [CircularProgressIndicator()],
+                              : [Center(child: CircularProgressIndicator(),)],
                         ),
                       ),
                     ],

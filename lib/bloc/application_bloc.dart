@@ -21,15 +21,7 @@ class ApplicationBloc implements BlocBase {
   ApplicationBloc() {
     _apiInfoDay().then((_) {
       print("FINISHED");
-      //_inInfoPage.add(UnmodifiableListView(_infoPage));
     });
-    /* DayTextService.getDayText(DateTime.now(), TEXTTYPE.SVYATCY).then((day) {
-      _infoPage.add(day);
-    }); */
-
-    /* _infoPage.forEach((x) {
-      print(">>>>>>>>${x.title}");
-    }); */
     _changeDateController.stream.listen(_handeChangeDate);
     _updateInfoPage.stream.listen(_handleUpdateInfoPage);
   }
@@ -39,21 +31,19 @@ class ApplicationBloc implements BlocBase {
   }
 
   Future<Null> _apiInfoDay() async {
-    //_infoPage = [];
-    for (var i=0; i < TEXTTYPE.values.length; i++) {
+    _infoPage = [];
+    for (var i = 0; i < TEXTTYPE.values.length; i++) {
       _infoPage.add(await DayTextService.getDayText(DateTime.now(), TEXTTYPE.values[i]));
     }
-    /* TEXTTYPE.values.forEach((type) async {
-      await DayTextService.getDayText(DateTime.now(), type).then( (day) => _infoPage.add(day));
-    }); */
+    
     _inInfoPage.add(UnmodifiableListView(_infoPage));
   }
 
-  _handeChangeDate(data) {
+  _handeChangeDate(data) async {
     _infoPage = [];
-    TEXTTYPE.values.forEach((type) {
-      DayTextService.getDayText(data, type).then((day) => _infoPage.add(day));
-    });
+    for (var i = 0; i < TEXTTYPE.values.length; i++) {
+      _infoPage.add(await DayTextService.getDayText(data, TEXTTYPE.values[i]));
+    }
     _inInfoPage.add(UnmodifiableListView(_infoPage));
   }
 

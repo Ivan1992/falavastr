@@ -32,6 +32,7 @@ class DayTextService {
 
   static Future<DayText> getDayText(DateTime day, TEXTTYPE type) async {
     String jsonString;
+    day = day.subtract(Duration(days: 13));
     today = day;
     DayText d;
 
@@ -78,8 +79,8 @@ class DayText {
     return DayText(sluzhby: [], title: "empty");
   }
 
-  factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {    
-    var glasObj = parsedJson[glas-1]["text"][(weekday+1) % 7];
+  factory DayText.oktay(List<dynamic> parsedJson, int glas, int weekday) {
+    var glasObj = parsedJson[glas-1]["text"][weekday % 7]["text"];
     List<Sluzhba> sluzhby = List()..add(Sluzhba.oktay(glasObj));
     return DayText(sluzhby: sluzhby, title: "Октай");
   }
@@ -126,8 +127,9 @@ class Sluzhba {
     return Sluzhba(parts: p);
   }
 
-  factory Sluzhba.oktay(Map<String, dynamic> parsedJson) {
-    List<Part> p = List()..add(Part(name: parsedJson["name"], text: parsedJson["text"]));
+  factory Sluzhba.oktay(List<dynamic> parsedJson) {
+    //List<Part> p = List()..add(Part(name: parsedJson["name"], text: parsedJson["text"]));
+    List<Part> p = parsedJson.map((i) => Part(name: i["name"], text: i["text"])).toList();
     return Sluzhba(parts: p);
   }
 
