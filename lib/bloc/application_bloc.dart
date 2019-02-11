@@ -19,9 +19,9 @@ class ApplicationBloc implements BlocBase {
   StreamSink get updateInfoPage => _updateInfoPage.sink;
 
   ApplicationBloc() {
-    _apiInfoDay().then((_) {
+    /* _apiInfoDay().then((_) {
       print("FINISHED");
-    });
+    }); */
     _changeDateController.stream.listen(_handeChangeDate);
     _updateInfoPage.stream.listen(_handleUpdateInfoPage);
   }
@@ -35,7 +35,7 @@ class ApplicationBloc implements BlocBase {
     for (var i = 0; i < TEXTTYPE.values.length; i++) {
       _infoPage.add(await DayTextService.getDayText(DateTime.now(), TEXTTYPE.values[i]));
     }
-    
+
     _inInfoPage.add(UnmodifiableListView(_infoPage));
   }
 

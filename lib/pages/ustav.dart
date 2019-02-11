@@ -80,20 +80,23 @@ class _UstavPageState extends State<UstavPage> {
       ),
       const PopupMenuDivider(),
       const PopupMenuItem<String>(
-        value: 'Share',
+        value: 'Orthodox',
+        child: ListTile(
+          leading: Icon(Icons.text_format),
+          title: Text('Ортодокс', style: TextStyle(fontFamily: 'Orthodox')),
+        ),
+      ),
+      const PopupMenuItem<String>(
+        value: 'Turaevo',
+        child: ListTile(
+            leading: Icon(Icons.text_format),
+            title: Text('Тураево', style: TextStyle(fontFamily: 'Turaevo'))),
+      ),
+      const PopupMenuItem<String>(
+        value: 'Grebnev',
         child: ListTile(
             leading: Icon(Icons.text_format),
             title: Text('Гребнев', style: TextStyle(fontFamily: 'Grebnev'))),
-      ),
-      const PopupMenuItem<String>(
-        value: 'Get Link',
-        child:
-            ListTile(leading: Icon(Icons.text_format), title: Text('Тураево')),
-      ),
-      const PopupMenuItem<String>(
-        value: 'Get Link',
-        child:
-            ListTile(leading: Icon(Icons.text_format), title: Text('Триодь')),
       ),
       const PopupMenuDivider(),
       PopupMenuItem(child: Text("Размер текста")),
@@ -124,8 +127,14 @@ class _UstavPageState extends State<UstavPage> {
                   tag: widget.name,
                   child: Material(
                     color: Colors.transparent,
-                    child: Text(widget.name, style: Theme.of(context).textTheme.caption.copyWith(fontSize: 20.0),),
-                  ), 
+                    child: Text(
+                      widget.name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(fontSize: 20.0),
+                    ),
+                  ),
                 ),
                 actions: <Widget>[
                   PopupMenuButton<String>(

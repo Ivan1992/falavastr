@@ -55,6 +55,12 @@ flutter:
         - asset: lib/fonts/OpenSans-Bold.ttf
         - asset: lib/fonts/OpenSans-Italic.ttf
         - asset: lib/fonts/OpenSans-Light.ttf
+    - family: Orthodox
+      fonts:
+        - asset: lib/fonts/OrtUCS8.ttf
+    - family: Turaevo
+      fonts:
+        - asset: lib/fonts/Turaevo.ttf
 
   assets:
     - lib/calendar/json/minea/yanvar.json
