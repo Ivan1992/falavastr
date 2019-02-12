@@ -1,7 +1,10 @@
+import 'package:falavastr/bloc/application_bloc.dart';
+import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/calendarPage.dart';
+import 'package:falavastr/pages/infopage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -65,6 +68,11 @@ class _UstavPageState extends State<UstavPage> {
     );
   }
 
+  void _changeFont(String value) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+    appBloc.inFontFamily.add(value);
+  }
+
   List<PopupMenuEntry<String>> _buildMenu(BuildContext context) {
     return <PopupMenuEntry<String>>[
       const PopupMenuItem<String>(
@@ -79,22 +87,25 @@ class _UstavPageState extends State<UstavPage> {
             title: Text('Дневная тема')),
       ),
       const PopupMenuDivider(),
-      const PopupMenuItem<String>(
+      PopupMenuItem<String>(
         value: 'Orthodox',
         child: ListTile(
+          onTap: () => _changeFont("Orthodox"),
           leading: Icon(Icons.text_format),
           title: Text('Ортодокс', style: TextStyle(fontFamily: 'Orthodox')),
         ),
       ),
-      const PopupMenuItem<String>(
+      PopupMenuItem<String>(
         value: 'Turaevo',
         child: ListTile(
+            onTap: () => _changeFont("Turaevo"),
             leading: Icon(Icons.text_format),
             title: Text('Тураево', style: TextStyle(fontFamily: 'Turaevo'))),
       ),
-      const PopupMenuItem<String>(
+      PopupMenuItem<String>(
         value: 'Grebnev',
         child: ListTile(
+            onTap: () => _changeFont("Grebnev"),
             leading: Icon(Icons.text_format),
             title: Text('Гребнев', style: TextStyle(fontFamily: 'Grebnev'))),
       ),
@@ -123,18 +134,12 @@ class _UstavPageState extends State<UstavPage> {
         floatingActionButton: !_fullscreen ? fab : null,
         appBar: !_fullscreen
             ? AppBar(
-                title: Hero(
-                  tag: widget.name,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Text(
-                      widget.name,
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          .copyWith(fontSize: 20.0),
-                    ),
-                  ),
+                title: Text(
+                  widget.name,
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption
+                      .copyWith(fontSize: 20.0),
                 ),
                 actions: <Widget>[
                   PopupMenuButton<String>(
@@ -152,16 +157,20 @@ class _UstavPageState extends State<UstavPage> {
                     icon: Icon(Icons.fullscreen),
                   ),
                   IconButton(
+                    onPressed: (){},
+                    icon: Icon(Icons.favorite)
+                  ),
+                  IconButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute<Null>(
                             builder: (BuildContext context) {
-                          return CalendarPage(
-                              widget.day.today.add(Duration(days: 13)));
+                              return InfoPage(today: widget.day.today,);
+                          //return CalendarPage(widget.day.today.add(Duration(days: 13)));
                         }),
                       );
                     },
-                    icon: Icon(Icons.today),
+                    icon: Icon(Icons.info),
                   ),
                 ],
               )

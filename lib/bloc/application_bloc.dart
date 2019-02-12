@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApplicationBloc implements BlocBase {
   List<DayText> _infoPage = [];
@@ -18,12 +19,27 @@ class ApplicationBloc implements BlocBase {
   StreamController _updateInfoPage = StreamController();
   StreamSink get updateInfoPage => _updateInfoPage.sink;
 
+  BehaviorSubject<String> _fontFamilyController = BehaviorSubject<String>(seedValue: "Grebnev");
+  Stream<String> get outFontFamily => _fontFamilyController.stream;
+  StreamSink<String> get inFontFamily => _fontFamilyController.sink;
+
+
   ApplicationBloc() {
-    /* _apiInfoDay().then((_) {
-      print("FINISHED");
-    }); */
+    _apiInfoDay();
     _changeDateController.stream.listen(_handeChangeDate);
     _updateInfoPage.stream.listen(_handleUpdateInfoPage);
+    _fontFamilyController.stream.listen(_handleChangeFont);
+    _loadInitialFont();
+  }
+
+  _handleChangeFont(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("fontFamily", value);
+  }
+
+  _loadInitialFont() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    inFontFamily.add(prefs.getString("fontFamily") ?? 'Grebnev');
   }
 
   _handleUpdateInfoPage(_) async {
@@ -51,5 +67,6 @@ class ApplicationBloc implements BlocBase {
     _infoPageController.close();
     _changeDateController.close();
     _updateInfoPage.close();
+    _fontFamilyController.close();
   }
 }

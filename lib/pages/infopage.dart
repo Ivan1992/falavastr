@@ -23,9 +23,9 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   bool _newStyle = true;
-  AnimationController controller;
-  Animation animation;
-  Animation curve;
+  AnimationController _controller, _offsetController;
+  Animation _animation, _offsetAnimation;
+  Animation _curve;
 
   String _month;
   String _weekday;
@@ -37,9 +37,16 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    controller = AnimationController(
+    _controller = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
-    curve = CurvedAnimation(parent: controller, curve: Curves.easeOut);
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+
+    _offsetController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _offsetAnimation = Tween(begin: -1.0, end: 0.0).animate(CurvedAnimation(
+      parent: _offsetController,
+      curve: Curves.fastOutSlowIn,
+    ));
 
     today =
         _newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
@@ -48,8 +55,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
     _weekday = DateFormat("EEEE", "ru").format(widget.today);
     _glas = DateService.glasString(widget.today);
 
-    animation = IntTween(begin: 0, end: today.day).animate(curve);
-    controller.forward();
+    _animation = IntTween(begin: 0, end: today.day).animate(_curve);
+    _controller.forward();
   }
 
   Widget _card(DayText d) {
@@ -63,7 +70,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
             padding: EdgeInsets.symmetric(vertical: 0.5),
             child: SizedBox.expand(
               child: OutlineButton(
-                onPressed: () async {
+                onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -81,13 +88,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
         padding: EdgeInsets.symmetric(horizontal: 40.0),
         child: Card(
           child: ExpansionTile(
-            title: Hero(
-              tag: d.title,
-              child: Material(
-                color: Colors.transparent,
-                child: Text(d.title),
-              ),
-            ),
+            title: Text(d.title),
             children: _options,
           ),
         ),
@@ -107,13 +108,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                 ),
               );
             },
-            title: Hero(
-              tag: d.title,
-              child: Material(
-                color: Colors.transparent,
-                child: Text(d.title),
-              ),
-            ),
+            title: Text(d.title),
           ),
         ),
       );
@@ -124,7 +119,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-    appBloc.changeDate.add(widget.today);
+    //appBloc.changeDate.add(widget.today);
 
     return Scaffold(
       drawer: DrawerOnly(),
@@ -133,7 +128,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushReplacement(
+              Navigator.of(context).push(
                 MaterialPageRoute<Null>(builder: (BuildContext context) {
                   return CalendarPage(widget.today);
                 }),
@@ -147,13 +142,16 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
           stream: appBloc.outInfoPage,
           builder:
               (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
+            if (snapshot.hasData) {
+              _offsetController.forward();
+            }
             return AnimatedBuilder(
-                animation: controller,
+                animation: _controller,
                 builder: (BuildContext context, Widget child) {
                   return Column(
                     children: <Widget>[
                       Text(
-                        animation.value.toString(),
+                        _animation.value.toString(),
                         textScaleFactor: 5.0,
                       ),
                       Text(_month, textScaleFactor: 2.0),
@@ -188,13 +186,29 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                         ),
                       ),
                       Expanded(
-                        child: ListView(
-                          physics: BouncingScrollPhysics(),
-                          children: snapshot.hasData
-                              ? snapshot.data.map((x) => _card(x)).toList()
-                              : [Center(child: CircularProgressIndicator(),)],
-                        ),
-                      ),
+                          child: AnimatedBuilder(
+                        animation: _offsetController,
+                        builder: (BuildContext context, Widget child) {
+                          final double _width =
+                              MediaQuery.of(context).size.width;
+                          return snapshot.hasData
+                              ? Transform(
+                                  transform: Matrix4.translationValues(
+                                      _offsetAnimation.value * _width,
+                                      0.0,
+                                      0.0),
+                                  child: ListView(
+                                    physics: BouncingScrollPhysics(),
+                                    children: snapshot.data
+                                        .map((x) => _card(x))
+                                        .toList(),
+                                  ),
+                                )
+                              : Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                        },
+                      )),
                     ],
                   );
                 });
@@ -204,7 +218,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
+    _offsetController.dispose();
     super.dispose();
   }
 
@@ -219,11 +234,11 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
       end = widget.today.subtract(Duration(days: 13)).day;
       today = widget.today.subtract(Duration(days: 13));
     }
-    controller.reset();
+    _controller.reset();
     /* curve = CurvedAnimation(
                                 parent: controller, curve: Curves.easeOut); */
-    animation = IntTween(begin: begin, end: end).animate(curve);
-    controller.forward();
+    _animation = IntTween(begin: begin, end: end).animate(_curve);
+    _controller.forward();
     _month = DateFormat("MMMM", "ru").format(today);
     _name = DateFormat("dd.MM.yyyy", "ru").format(today);
   }

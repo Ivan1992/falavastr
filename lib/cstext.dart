@@ -1,3 +1,5 @@
+import 'package:falavastr/bloc/application_bloc.dart';
+import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
@@ -26,7 +28,7 @@ class _CsText extends State<CsText> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _fontSize = prefs.getDouble("fontSize") ?? 2.0;
-      _fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
+      //_fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
     });
   }
 
@@ -125,25 +127,32 @@ class _CsText extends State<CsText> {
   @override
   Widget build(BuildContext context) {
     //final ScrollController _controller
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
 
     return GestureDetector(
-      onScaleStart: _handleOnScaleStart,
-      onScaleUpdate: _handleScaleUpdate,
-      onScaleEnd: _savePreferences,
-      child: DraggableScrollbar.semicircle(
-        backgroundColor: Theme.of(context).accentColor,
-        child: ListView(
-          controller: widget.controller,
-          padding: EdgeInsets.all(10.0),
-          children: _parseText(widget.text),
-        ),
-        controller: widget.controller,
-      ),
-      /* child: ListView(
+        onScaleStart: _handleOnScaleStart,
+        onScaleUpdate: _handleScaleUpdate,
+        onScaleEnd: _savePreferences,
+        child: StreamBuilder(
+          stream: appBloc.outFontFamily,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            _fontFamily = snapshot.hasData ? snapshot.data : 'Grebnev';
+            return DraggableScrollbar.semicircle(
+              backgroundColor: Theme.of(context).accentColor,
+              child: ListView(
+                controller: widget.controller,
+                padding: EdgeInsets.all(10.0),
+                children: _parseText(widget.text),
+              ),
+              controller: widget.controller,
+            );
+          },
+        )
+        /* child: ListView(
         controller: _controller,
         padding: EdgeInsets.all( 10.0),
         children: _parseText(widget.text),
       ), */
-    );
+        );
   }
 }

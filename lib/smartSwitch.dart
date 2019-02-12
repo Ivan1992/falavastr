@@ -98,7 +98,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
       child: Container(
         height: _height,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Colors.black12,
           borderRadius: BorderRadius.all(
             Radius.circular(20.0),
           ),

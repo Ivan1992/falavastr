@@ -13,11 +13,11 @@ class CalendarCarousel extends StatefulWidget {
     color: Colors.blue,
   );
   final TextStyle defaultPrevDaysTextStyle = TextStyle(
-    color: Colors.grey,
+    color: Colors.grey[900],
     fontSize: 14.0,
   );
   final TextStyle defaultNextDaysTextStyle = TextStyle(
-    color: Colors.grey,
+    color: Colors.grey[900],
     fontSize: 14.0,
   );
   final TextStyle defaultDaysTextStyle = TextStyle(
@@ -37,7 +37,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultWeekendTextStyle = TextStyle(
-    color: Colors.pink[100],
+    color: Colors.teal,//Colors.pink[50],
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveDaysTextStyle = TextStyle(
@@ -45,7 +45,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveWeekendTextStyle = TextStyle(
-    color: Colors.pink[100].withOpacity(0.6),
+    color: Colors.teal,//Colors.pink[100].withOpacity(0.6),
     fontSize: 14.0,
   );
   final Widget defaultMarkedDateWidget = Container(
@@ -505,9 +505,11 @@ class _CalendarState extends State<CalendarCarousel> {
     } else if (DateService.isPrazdnik(now, 1)) {
       fillColor = Colors.transparent;
       borderColor = Colors.red[800];
+      textColor = Colors.teal;
     } else if (DateService.isFastDay(now)) {
       fillColor = Colors.grey[600];
       borderColor = Colors.transparent;
+      textColor = Colors.teal;
     }
     
 
@@ -548,8 +550,8 @@ class _CalendarState extends State<CalendarCarousel> {
                     !isSelectedDay &&
                     !isToday
                 ? (isSelectable
-                    ? widget.weekendTextStyle
-                    : widget.inactiveWeekendTextStyle)
+                    ? TextStyle(color: Colors.white) //widget.weekendTextStyle
+                    : TextStyle(color: Colors.black12)) //widget.inactiveWeekendTextStyle)
                 : isToday
                     ? widget.todayTextStyle
                     : isSelectable ? textStyle : widget.inactiveDaysTextStyle,

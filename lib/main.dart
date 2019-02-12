@@ -12,36 +12,41 @@ void main() => runApp(BlocProvider<ApplicationBloc>(
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Color(0xFFb97b50),
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.brown[200]//Color(0xFFb97b50),
     ));
     return MaterialApp(
       title: 'Алавастр',
       theme: ThemeData(
         fontFamily: "Balkara",
-        //primarySwatch: Colors.blue,
-        backgroundColor: Color(0xFF36332e),
-        primaryColor: Color(0xFFb97b50),
-        secondaryHeaderColor: Color(0xFFEFE6DD),
-        buttonColor: Color(0xFF4c7e7a),
-        buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-        accentColor: Color(0xFFBB4430),
-        canvasColor: Color(0xFF36332e),
-        scaffoldBackgroundColor: Color(0xFF36332e),
-        bottomAppBarColor: Color(0xFF7EBDC2),
+        primarySwatch: Colors.blue,
+        backgroundColor: Colors.teal,//Color(0xFF36332e),
+        primaryColor: Colors.brown[200],//Color(0xFFb97b50),
+        secondaryHeaderColor: Colors.pink,//Color(0xFFEFE6DD),
+        buttonColor: Colors.blue[200],//Color(0xFF4c7e7a),
+        //buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+        accentColor: Colors.red[200],//Colors.teal[200],//Color(0xFFBB4430),
+        canvasColor: Colors.brown[200],//Color(0xFF36332e),
+        scaffoldBackgroundColor: Colors.brown[300],//Color(0xFF36332e),
+        bottomAppBarColor: Colors.brown[50],//Color(0xFF7EBDC2),
+        buttonTheme: ButtonThemeData(
+          buttonColor: Colors.black,
+        ),
+        dialogBackgroundColor: Colors.deepOrange,
         textTheme: TextTheme(
-          headline: TextStyle(color: Colors.red), //Color(0xFFa85147)),
+          headline: TextStyle(color: Colors.deepOrange),//Colors.red), //Color(0xFFa85147)),
           caption: TextStyle(color: Colors.white), //Color(0xFFa85147)),
-          body1: TextStyle(color: Colors.red[300]), //Color(0xFFa85147)),
+          body1: TextStyle(color: Colors.brown[900], fontSize: 15.0), //Color(0xFFa85147)),
           body2: TextStyle(
-              color: Colors.red), //TextStyle(color: Color(0xFFa85147)),
-          title: TextStyle(color: Color(0xFFa85147)),
-          subhead: TextStyle(color: Color(0xFFd6ceb9)),
+              color: Colors.orange), //TextStyle(color: Color(0xFFa85147)),
+          title: TextStyle(color: Colors.brown[900]),//Color(0xFFa85147)),
+          subhead: TextStyle(color: Colors.lightBlue),//Color(0xFFd6ceb9)),
         ),
         iconTheme: IconThemeData(
-          color: Colors.white,
+          color: Colors.black,
         ),
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
+
       ),
       home: InfoPage(
         today: DateTime.now(),
