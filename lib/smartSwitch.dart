@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SmartSwitch extends StatefulWidget {
-  const SmartSwitch({Key key, this.onChange, this.beginState=true}) : super(key: key);
+  const SmartSwitch({Key key, this.onChange, this.beginState = true})
+      : super(key: key);
 
   final ValueChanged<bool> onChange;
   final bool beginState;
@@ -21,6 +22,7 @@ class _SmartSwitchState extends State<SmartSwitch> {
   double _height;
   Color _originalColor = Colors.white;
   Color _buttonColor;
+  bool _oldValue;
 
   @override
   void initState() {
@@ -30,21 +32,24 @@ class _SmartSwitchState extends State<SmartSwitch> {
     _height = 30.0;
     _originalColor = Colors.white;
     _buttonColor = _originalColor;
-    _position = Offset(widget.beginState? (_containerWidth - _buttonWidth) : 0.0, 0.0);
+    _position =
+        Offset(widget.beginState ? (_containerWidth - _buttonWidth) : 0.0, 0.0);
+    _oldValue = widget.beginState;
   }
 
   void _switch(bool val) {
     if (!val) {
       setState(() {
         _position = Offset(0.0, _position.dy);
-        widget.onChange(false);
+        if (val != _oldValue) widget.onChange(false);
       });
     } else {
       setState(() {
         _position = Offset(_containerWidth - _buttonWidth, _position.dy);
-        widget.onChange(true);
+        if (val != _oldValue) widget.onChange(true);
       });
     }
+    _oldValue = val;
   }
 
   void _onPanEnd(DragEndDetails details) {
@@ -78,14 +83,14 @@ class _SmartSwitchState extends State<SmartSwitch> {
     );
 
     var knopochka = Positioned(
-        left: _position.dx,
-        top: _position.dy,
-        child: GestureDetector(
-          onPanEnd: _onPanEnd,
-          onPanUpdate: _onPanUpdate,
-          child: obj,
-        ),
-      );
+      left: _position.dx,
+      top: _position.dy,
+      child: GestureDetector(
+        onPanEnd: _onPanEnd,
+        onPanUpdate: _onPanUpdate,
+        child: obj,
+      ),
+    );
 
     var row = (Widget child) => GestureDetector(
           onPanEnd: _onPanEnd,

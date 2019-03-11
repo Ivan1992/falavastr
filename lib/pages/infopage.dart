@@ -47,16 +47,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
       parent: _offsetController,
       curve: Curves.fastOutSlowIn,
     ));
-
-    today =
-        _newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
-    _month = DateFormat("MMMM", "ru").format(today);
-    _name = DateFormat("dd.MM.yyyy", "ru").format(today);
-    _weekday = DateFormat("EEEE", "ru").format(widget.today);
-    _glas = DateService.glasString(widget.today);
-
-    _animation = IntTween(begin: 0, end: today.day).animate(_curve);
-    _controller.forward();
+    _setDate(true);
   }
 
   Widget _card(DayText d) {
@@ -116,11 +107,21 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
     return toReturn;
   }
 
+  _setDate(newStyle) {
+    today = newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
+    _month = DateFormat("MMMM", "ru").format(today);
+    _name = DateFormat("dd.MM.yyyy", "ru").format(today);
+    _weekday = DateFormat("EEEE", "ru").format(widget.today);
+    _glas = DateService.glasString(widget.today);
+
+    _animation = IntTween(begin: 0, end: today.day).animate(_curve);
+    _controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
     //appBloc.changeDate.add(widget.today);
-
     return Scaffold(
       drawer: DrawerOnly(),
       appBar: AppBar(
@@ -130,7 +131,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute<Null>(builder: (BuildContext context) {
-                  return CalendarPage(widget.today);
+                  return CalendarPage(today);
                 }),
               );
             },
@@ -156,12 +157,24 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                       ),
                       Text(_month, textScaleFactor: 2.0),
                       Text(_weekday, textScaleFactor: 2.0),
-                      SmartSwitch(
-                        onChange: (val) {
-                          setState(() {
-                            _newStyle = val;
-                            _animate(val);
-                          });
+                      StreamBuilder(
+                        stream: appBloc.outNewStyle,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<bool> snapshot) {
+                          if (snapshot.hasData) _setDate(snapshot.data);
+
+                          return snapshot.hasData
+                              ? SmartSwitch(
+                                  onChange: (val) {
+                                    appBloc.inNewStyle.add(val);
+                                    setState(() {
+                                      _newStyle = val;
+                                      _animate(val);
+                                    });
+                                  },
+                                  beginState: snapshot.data,
+                                )
+                              : Container();
                         },
                       ),
                       Padding(

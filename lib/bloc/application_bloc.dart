@@ -23,13 +23,22 @@ class ApplicationBloc implements BlocBase {
   Stream<String> get outFontFamily => _fontFamilyController.stream;
   StreamSink<String> get inFontFamily => _fontFamilyController.sink;
 
+  BehaviorSubject<bool> _newStyleController = BehaviorSubject<bool>(seedValue: true);
+  Stream<bool> get outNewStyle => _newStyleController.stream;
+  StreamSink<bool> get inNewStyle => _newStyleController.sink;
 
   ApplicationBloc() {
     _apiInfoDay();
     _changeDateController.stream.listen(_handeChangeDate);
     _updateInfoPage.stream.listen(_handleUpdateInfoPage);
-    _fontFamilyController.stream.listen(_handleChangeFont);
-    _loadInitialFont();
+    outFontFamily.listen(_handleChangeFont);
+    outNewStyle.listen(_handleChangeNewStyle);
+    _loadInitialPrefs();
+  }
+
+  _handleChangeNewStyle(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("newStyle", value);
   }
 
   _handleChangeFont(value) async {
@@ -37,9 +46,10 @@ class ApplicationBloc implements BlocBase {
     prefs.setString("fontFamily", value);
   }
 
-  _loadInitialFont() async {
+  _loadInitialPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     inFontFamily.add(prefs.getString("fontFamily") ?? 'Grebnev');
+    inNewStyle.add(prefs.getBool("newStyle") ?? true);
   }
 
   _handleUpdateInfoPage(_) async {
@@ -68,5 +78,6 @@ class ApplicationBloc implements BlocBase {
     _changeDateController.close();
     _updateInfoPage.close();
     _fontFamilyController.close();
+    _newStyleController.close();
   }
 }

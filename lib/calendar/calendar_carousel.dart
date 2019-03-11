@@ -507,9 +507,12 @@ class _CalendarState extends State<CalendarCarousel> {
       borderColor = Colors.red[800];
       textColor = Colors.teal;
     } else if (DateService.isFastDay(now)) {
-      fillColor = Colors.grey[600];
+      fillColor = Colors.grey[500];
       borderColor = Colors.transparent;
       textColor = Colors.teal;
+    }
+    if (isSelectedDay) {
+      fillColor = Colors.blue[200];
     }
     
 
