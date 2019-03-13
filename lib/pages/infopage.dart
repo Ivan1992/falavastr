@@ -213,6 +213,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                                   child: ListView(
                                     physics: BouncingScrollPhysics(),
                                     children: snapshot.data
+                                        .where((x) => x != null)
                                         .map((x) => _card(x))
                                         .toList(),
                                   ),

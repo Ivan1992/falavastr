@@ -31,6 +31,14 @@ class DayTextService {
     return await rootBundle.loadString(path);
   }
 
+  static Future<List<DayText>> getKanonnik() async {
+    List<DayText> _dayTextList = [];
+    String jsonString = await _load(_kanonnik);
+    List<dynamic> parsed = json.decode(jsonString);
+    _dayTextList = parsed.map((item) => DayText.kanonnik(item)).toList();
+    return _dayTextList;
+  }
+
   static Future<DayText> getDayText(DateTime day, TEXTTYPE type) async {
     String jsonString;
     day = day.subtract(Duration(days: 13));
@@ -59,11 +67,6 @@ class DayTextService {
         d.today = day;
         return d;
       //case TEXTTYPE.TRIOD:
-      case TEXTTYPE.KANONNIK:
-        jsonString = await _load(_kanonnik);
-        d = DayText.kanonnik(json.decode(jsonString));
-        d.today = day;
-        return d;
 
       default:
         return null;
@@ -109,10 +112,10 @@ class DayText {
     );
   }
 
-  factory DayText.kanonnik(List<dynamic> parsedJson) {
+  factory DayText.kanonnik(dynamic item) {
     //List<Sluzhba> sluzhby = List()..add(Sluzhba.kanonnik(parsedJson));
-    List<Sluzhba> sluzhby = parsedJson.map((i) => Sluzhba.kanonnik(i)).toList();
-    return DayText(title: "Канонник", sluzhby: sluzhby);
+    List<Sluzhba> sluzhby = List()..add(Sluzhba(parts: List()..add(Part(name: item["name"], text: item["text"])))); 
+    return DayText(title: item["name"], sluzhby: sluzhby);
   }
 
   String toString() {

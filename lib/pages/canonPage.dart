@@ -3,6 +3,7 @@ import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/calendarPage.dart';
+import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 
 class CanonPage extends StatelessWidget {
@@ -12,25 +13,12 @@ class CanonPage extends StatelessWidget {
 
     return StreamBuilder(
       stream: appBloc.outCanonsList,
-      builder: (BuildContext context, AsyncSnapshot<DayText> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
         if (!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(),
           );
         }
-
-        /*
-         * onPressed: () {
-                Navigator.of(context).push(
-                  new MaterialPageRoute<Null>(
-                      builder: (BuildContext context) {
-                        return CalendarPage();
-                      },
-                      fullscreenDialog: true),
-                );
-              },
-         */
-
         return Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {},
@@ -40,13 +28,32 @@ class CanonPage extends StatelessWidget {
           appBar: AppBar(
             title: Text("Канонник"),
           ),
-          body: ListView(
-            children: snapshot.data.sluzhby
-                .map((item) => ListTile(
-                      title: Text(item.parts[0].name),
-                    ))
-                .toList(),
+          body: ListView.separated(
+            separatorBuilder: (context, index) => Divider(
+                  color: Colors.black,
+                ),
+            itemCount: snapshot.data.length,
+            itemBuilder: (context, index) =>
+                _buildItem(snapshot.data[index], context),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildItem(DayText item, BuildContext context) {
+    return ListTile(
+      title: Text(
+        item.sluzhby[0].parts[0].name,
+        style: TextStyle(color: Colors.white),
+      ),
+      onTap: () {
+        Navigator.of(context).push(
+          new MaterialPageRoute<Null>(
+              builder: (BuildContext context) {
+                return UstavPage(item.sluzhby[0].parts[0].name, item);
+              },
+              fullscreenDialog: true),
         );
       },
     );

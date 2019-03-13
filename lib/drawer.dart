@@ -1,6 +1,7 @@
 import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/pages/calendarPage.dart';
+import 'package:falavastr/pages/canonPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -31,7 +32,7 @@ class DrawerOnly extends StatelessWidget {
         Navigator.push(
           ctxt,
           MaterialPageRoute(
-            builder: (ctxt) => UstavPage(d.title, d),
+            builder: (ctxt) => CanonPage(),
           ),
         );
       },
