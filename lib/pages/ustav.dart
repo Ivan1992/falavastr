@@ -3,7 +3,6 @@ import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
-import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/infopage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';

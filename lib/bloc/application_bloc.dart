@@ -7,11 +7,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApplicationBloc implements BlocBase {
   List<DayText> _infoPage = [];
+  DayText _canonsList;
 
   BehaviorSubject<List<DayText>> _infoPageController =
       BehaviorSubject<List<DayText>>();
   StreamSink<List<DayText>> get _inInfoPage => _infoPageController.sink;
   Stream<List<DayText>> get outInfoPage => _infoPageController.stream;
+
+  BehaviorSubject<DayText> _canonsListConteroller =  BehaviorSubject<DayText>();
+  Stream<DayText> get outCanonsList => _canonsListConteroller.stream;
 
   StreamController _changeDateController = StreamController();
   StreamSink get changeDate => _changeDateController.sink;
@@ -34,6 +38,7 @@ class ApplicationBloc implements BlocBase {
     outFontFamily.listen(_handleChangeFont);
     outNewStyle.listen(_handleChangeNewStyle);
     _loadInitialPrefs();
+    _loadCanonsList();
   }
 
   _handleChangeNewStyle(value) async {
@@ -50,6 +55,10 @@ class ApplicationBloc implements BlocBase {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     inFontFamily.add(prefs.getString("fontFamily") ?? 'Grebnev');
     inNewStyle.add(prefs.getBool("newStyle") ?? true);
+  }
+
+  _loadCanonsList() async {
+    _canonsList = await DayTextService.getDayText(null, TEXTTYPE.KANONNIK);
   }
 
   _handleUpdateInfoPage(_) async {
@@ -79,5 +88,6 @@ class ApplicationBloc implements BlocBase {
     _updateInfoPage.close();
     _fontFamilyController.close();
     _newStyleController.close();
+    _canonsListConteroller.close();
   }
 }

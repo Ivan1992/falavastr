@@ -23,6 +23,7 @@ class DayTextService {
   static const String _mineaPath =  "lib/calendar/json/minea/";
   static const String _oktay =      "lib/calendar/json/oktay/oktay.json";
   static const String _svyatcy =    "lib/calendar/json/svyatcy/svyatcy.json";
+  static const String _kanonnik =   "lib/calendar/json/kanonnik/kanonnik.json";
 
   static DateTime today = DateTime.now();
 
@@ -58,6 +59,11 @@ class DayTextService {
         d.today = day;
         return d;
       //case TEXTTYPE.TRIOD:
+      case TEXTTYPE.KANONNIK:
+        jsonString = await _load(_kanonnik);
+        d = DayText.kanonnik(json.decode(jsonString));
+        d.today = day;
+        return d;
 
       default:
         return null;
@@ -66,7 +72,7 @@ class DayTextService {
 }
 
 //enum TEXTTYPE { SVYATCY, EVANGELIE, APOSTOL, MINEA, OKTAY, TRIOD }
-enum TEXTTYPE { SVYATCY, MINEA, OKTAY  }
+enum TEXTTYPE { SVYATCY, MINEA, OKTAY, KANONNIK }
 
 class DayText {
   final String title;
@@ -101,6 +107,12 @@ class DayText {
       title: "Минея",//parsedJson[day]['title'],
       sluzhby: sluzhby,
     );
+  }
+
+  factory DayText.kanonnik(List<dynamic> parsedJson) {
+    //List<Sluzhba> sluzhby = List()..add(Sluzhba.kanonnik(parsedJson));
+    List<Sluzhba> sluzhby = parsedJson.map((i) => Sluzhba.kanonnik(i)).toList();
+    return DayText(title: "Канонник", sluzhby: sluzhby);
   }
 
   String toString() {
@@ -138,6 +150,12 @@ class Sluzhba {
         parsedJson.map((i) => Part(name: i["name"], text: i["text"])).toList();
     return Sluzhba(parts: p);
   }
+
+  factory Sluzhba.kanonnik(Map<String, dynamic> parsedJson) {
+    List<Part> p = List()..add(Part(name: parsedJson["name"], text: parsedJson["text"]));
+    return Sluzhba(parts: p);
+  }
+
 }
 
 class Part {

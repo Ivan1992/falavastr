@@ -17,7 +17,7 @@ class DrawerOnly extends StatelessWidget {
   }
 
   ListTile _getDummy(BuildContext ctxt, String name,
-      [Icon icon = const Icon(Icons.bookmark), double padding = 0.0]) {
+      [Icon icon = const Icon(Icons.bookmark), double padding = 0.0, DayText d]) {
     return ListTile(
       leading: icon,
       title: Padding(
@@ -27,7 +27,14 @@ class DrawerOnly extends StatelessWidget {
           style: TextStyle(color: Theme.of(ctxt).primaryTextTheme.title.color),
         ),
       ),
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          ctxt,
+          MaterialPageRoute(
+            builder: (ctxt) => UstavPage(d.title, d),
+          ),
+        );
+      },
     );
   }
 
@@ -58,11 +65,8 @@ class DrawerOnly extends StatelessWidget {
 
     const List<String> names = [
       "СВЯТЦЫ",
-      "ЕВАНГЕЛИЕ",
-      "АПОСТОЛ",
       "МИНЕЯ",
       "ОКТАЙ",
-      "ТРИОДЬ"
     ];
 
     List<ListTile> sublist = names.map((name) {
