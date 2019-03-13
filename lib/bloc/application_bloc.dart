@@ -59,6 +59,7 @@ class ApplicationBloc implements BlocBase {
 
   _loadCanonsList() async {
     _canonsList = await DayTextService.getDayText(null, TEXTTYPE.KANONNIK);
+    _canonsListConteroller.sink.add(_canonsList);
   }
 
   _handleUpdateInfoPage(_) async {
