@@ -2,7 +2,6 @@ import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/drawer.dart';
-import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +50,7 @@ class CanonPage extends StatelessWidget {
         Navigator.of(context).push(
           new MaterialPageRoute<Null>(
               builder: (BuildContext context) {
-                return UstavPage(item.sluzhby[0].parts[0].name, item);
+                return UstavPage(item.sluzhby[0].parts[0].name, item, 0, false);
               },
               fullscreenDialog: true),
         );

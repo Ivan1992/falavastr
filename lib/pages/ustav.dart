@@ -11,8 +11,9 @@ class UstavPage extends StatefulWidget {
   final String name;
   final DayText day;
   final int initialPart;
+  final bool showInfo;
 
-  UstavPage(this.name, this.day, [this.initialPart = 0]);
+  UstavPage(this.name, this.day, [this.initialPart = 0, this.showInfo = true]);
 
   @override
   State<StatefulWidget> createState() => _UstavPageState();
@@ -159,7 +160,7 @@ class _UstavPageState extends State<UstavPage> {
                     onPressed: (){},
                     icon: Icon(Icons.favorite)
                   ),
-                  IconButton(
+                  widget.showInfo ? IconButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute<Null>(
@@ -170,7 +171,7 @@ class _UstavPageState extends State<UstavPage> {
                       );
                     },
                     icon: Icon(Icons.info),
-                  ),
+                  ) : Container(),
                 ],
               )
             : null,
