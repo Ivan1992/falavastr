@@ -1,6 +1,6 @@
 import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
-import 'package:falavastr/pages/infopage.dart';
+import 'package:falavastr/pages/calendarPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -48,9 +48,10 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
 
       ),
-      home: InfoPage(
+      home: CalendarPage(),
+      /* home: InfoPage(
         today: DateTime.now(),
-      ), //MainCollapsingToolbar(),
+      ), */
     );
   }
 }

@@ -7,7 +7,8 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 class CsText extends StatefulWidget {
   final String text;
   final ScrollController controller;
-  CsText(this.text, this.controller);
+  final Color textColor;
+  CsText(this.text, this.controller, [this.textColor = Colors.black]);
 
   @override
   State<StatefulWidget> createState() => _CsText();
@@ -53,7 +54,7 @@ class _CsText extends State<CsText> {
         if (left.isNotEmpty && fn.length > 1) {
           toReturn.add(Text.rich(
             TextSpan(
-                style: TextStyle(color: Colors.black, fontFamily: _fontFamily),
+                style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
                 children: _parseRed(left)),
             textAlign: TextAlign.center,
             textScaleFactor: _fontSize,
@@ -63,7 +64,7 @@ class _CsText extends State<CsText> {
             textAlign: TextAlign.justify,
             textScaleFactor: _fontSize,
             text: TextSpan(
-              style: TextStyle(color: Colors.black, fontFamily: _fontFamily),
+              style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
               children: _parseRed(left),
             ),
           ));
@@ -76,7 +77,7 @@ class _CsText extends State<CsText> {
               textAlign: TextAlign.justify,
               textScaleFactor: _fontSize,
               text: TextSpan(
-                style: TextStyle(color: Colors.black, fontFamily: _fontFamily),
+                style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
                 children: _parseRed(right),
               ),
             ));
@@ -138,7 +139,7 @@ class _CsText extends State<CsText> {
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
             _fontFamily = snapshot.hasData ? snapshot.data : 'Grebnev';
             return DraggableScrollbar.semicircle(
-              backgroundColor: Theme.of(context).accentColor,
+              backgroundColor: Theme.of(context).primaryColor,
               child: ListView(
                 controller: widget.controller,
                 padding: EdgeInsets.all(10.0),

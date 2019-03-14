@@ -1,7 +1,12 @@
+import 'package:falavastr/bloc/application_bloc.dart';
+import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
+import 'package:falavastr/pages/aboutPage.dart';
 import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/canonPage.dart';
+import 'package:falavastr/pages/libraryPage.dart';
+import 'package:falavastr/pages/settingsPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -18,7 +23,10 @@ class DrawerOnly extends StatelessWidget {
   }
 
   ListTile _getDummy(BuildContext ctxt, String name,
-      [Icon icon = const Icon(Icons.bookmark), double padding = 0.0, DayText d]) {
+      [Icon icon = const Icon(Icons.bookmark),
+      double padding = 0.0,
+      DayText d,
+      Widget navigateTo]) {
     return ListTile(
       leading: icon,
       title: Padding(
@@ -32,7 +40,7 @@ class DrawerOnly extends StatelessWidget {
         Navigator.push(
           ctxt,
           MaterialPageRoute(
-            builder: (ctxt) => CanonPage(),
+            builder: (ctxt) => navigateTo == null ? CanonPage() : navigateTo,
           ),
         );
       },
@@ -51,8 +59,7 @@ class DrawerOnly extends StatelessWidget {
         ),
       ),
       onTap: () {
-        Navigator.pop(ctxt);
-        Navigator.push(
+        Navigator.pushReplacement(
             ctxt,
             MaterialPageRoute(
                 builder: (ctxt) => UstavPage(name, day),
@@ -61,114 +68,49 @@ class DrawerOnly extends StatelessWidget {
     );
   }
 
-  Future<List<ListTile>> getAllTiles(BuildContext ctxt) async {
-    DayText day = await DayTextService.getDayText(_today, TEXTTYPE.MINEA);
-
-    const List<String> names = [
-      "СВЯТЦЫ",
-      "МИНЕЯ",
-      "ОКТАЙ",
-    ];
-
-    List<ListTile> sublist = names.map((name) {
-      return _getTile(
-          ctxt, name, day, Icon(Icons.subdirectory_arrow_right), 10.0);
-    }).toList();
-
-    return sublist;
-  }
-
   @override
   Widget build(BuildContext ctxt) {
-    String _month = DateFormat("MMMM", "ru").format(_today);
-    String _weekday = DateFormat("EEEE", "ru").format(_today);
-    String _glas = DateService.glasString(_today);
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(ctxt);
 
-    return FutureBuilder(
-      future: getAllTiles(ctxt),
-      builder: (BuildContext ctxt, AsyncSnapshot<List<ListTile>> snapshot) {
+    return StreamBuilder(
+      stream: appBloc.outInfoPage,
+      builder: (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
         return Drawer(
           child: ListView(
             children: <Widget>[
               DrawerHeader(
                 decoration: BoxDecoration(color: Colors.black),
                 child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Container(
-                                  decoration: ShapeDecoration(
-                                    shape: const StadiumBorder(
-                                      side: BorderSide(
-                                        color: Colors.red,
-                                        width: 3.0,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(3.0),
-                                    child: Text("${_today.day}",
-                                        style: Theme.of(ctxt)
-                                            .primaryTextTheme
-                                            .title),
-                                  )),
-                              Text(_month,
-                                  style: Theme.of(ctxt).primaryTextTheme.title)
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Text("Пища с маслом",
-                                  style: TextStyle(color: Colors.white)),
-                              /* RaisedButton(
-                                onPressed: () {},
-                                child: Text("Подробнее..."),
-                              ), */
-                            ],
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[Text("$_weekday, глас $_glas")],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            mini: true,
-                            backgroundColor: Theme.of(ctxt).buttonColor,
-                            onPressed: () {
-                              Navigator.of(ctxt)
-                                  .push(new MaterialPageRoute<Null>(
-                                      builder: (BuildContext context) {
-                                        return CalendarPage();
-                                      },
-                                      fullscreenDialog: true));
-                            },
-                            child: Icon(Icons.calendar_today),
-                          ),
-                        ],
-                      )
-                    ],
+                    child: Center(
+                  child: Text(
+                    "Алавастр",
+                    style: TextStyle(color: Colors.white),
                   ),
-                ),
+                )),
               ),
               ExpansionTile(
                   initiallyExpanded: expanded,
                   leading: Icon(Icons.bookmark),
-                  title: Text("Устав на сегодня",
-                      style: TextStyle(
-                          color: Theme.of(ctxt).primaryTextTheme.title.color)),
-                  children: snapshot.data),
-              _getDummy(ctxt, "Библиотека", Icon(Icons.stars)),
-              _getDummy(ctxt, "Ежедневные молитвы", Icon(Icons.calendar_today)),
-              _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted)),
-              _getDummy(ctxt, "О программе", Icon(Icons.info)),
+                  title: Text(
+                    "Устав на сегодня",
+                    style: TextStyle(
+                        color: Theme.of(ctxt).primaryTextTheme.title.color),
+                  ),
+                  children: snapshot.hasData
+                      ? snapshot.data
+                          .where((x) => x != null)
+                          .map((x) => _getTile(ctxt, x.title, x,
+                              Icon(Icons.subdirectory_arrow_right), 10.0))
+                          .toList()
+                      : <Widget>[Center(child: CircularProgressIndicator())]),
+              _getDummy(ctxt, "Библиотека", Icon(Icons.library_books), 0.0,
+                  null, LibraryPage()), //stars
+              _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted), 0.0,
+                  null, CanonPage()),
+              _getDummy(ctxt, "Настройки", Icon(Icons.settings), 0.0, null,
+                  SettigsPage()),
+              _getDummy(ctxt, "О программе", Icon(Icons.info), 0.0, null,
+                  AboutPage()),
             ],
           ),
         );

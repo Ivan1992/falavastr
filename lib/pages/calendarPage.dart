@@ -68,6 +68,8 @@ class _CalendarPage extends State<CalendarPage> {
                             daysHaveCircularBorder: false,
                             customGridViewPhysics:
                                 NeverScrollableScrollPhysics(),
+                            todayBorderColor: Colors.transparent,
+                            
                           ),
                         ),
                       ],

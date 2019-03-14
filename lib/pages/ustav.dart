@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
@@ -25,6 +27,7 @@ class _UstavPageState extends State<UstavPage> {
   bool _fullscreen = false;
   final ScrollController controller =
       ScrollController(initialScrollOffset: 0.0);
+  Color backgroundColor = Colors.white;
 
   void showMenuSelection(String value) {
     print('You selected: $value');
@@ -73,47 +76,63 @@ class _UstavPageState extends State<UstavPage> {
     appBloc.inFontFamily.add(value);
   }
 
+  void _changeNightMode(bool value) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+    appBloc.inNightMode.add(value);
+  }
+
+  PopupMenuItem<String> _createFontTile(String name, String label) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+
+    return PopupMenuItem<String>(
+      value: name,
+      child: StreamBuilder(
+          stream: appBloc.outFontFamily,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            bool selected = snapshot.hasData ? (snapshot.data == name) : false;
+            return ListTile(
+              onTap: () => _changeFont(name),
+              leading: Icon(Icons.text_format),
+              title: Text(label, style: TextStyle(fontFamily: name)),
+              trailing: selected ? Icon(Icons.check) : null,
+            );
+          }),
+    );
+  }
+
+  PopupMenuItem<String> _createNightMode(String text, bool value) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+
+    return PopupMenuItem<String>(
+        value: text,
+        child: ListTile(
+          leading: Icon(Icons.format_color_fill),
+          title: Text(text),
+          onTap: () {
+            _changeNightMode(value);
+            setState(() {
+              backgroundColor = value ? Colors.blueGrey[900] : Colors.white;
+              _cstext = CsText(_cstext.text, _cstext.controller, value ? Colors.yellow[200] : Colors.black);
+            });
+          },
+          trailing: StreamBuilder(
+            stream: appBloc.outNightMode,
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              return (snapshot.hasData && (snapshot.data == value)) ? Icon(Icons.check) : Container(width: 0.0, height: 0.0);
+            },
+          ),
+        ),
+      );
+  }
+
   List<PopupMenuEntry<String>> _buildMenu(BuildContext context) {
     return <PopupMenuEntry<String>>[
-      const PopupMenuItem<String>(
-        value: 'Preview',
-        child: ListTile(
-            leading: Icon(Icons.format_color_fill), title: Text('Ночная тема')),
-      ),
-      const PopupMenuItem<String>(
-        value: 'Preview',
-        child: ListTile(
-            leading: Icon(Icons.format_color_fill),
-            title: Text('Дневная тема')),
-      ),
+      _createNightMode("Ночная тема", true),
+      _createNightMode("Дневная тема", false),
       const PopupMenuDivider(),
-      PopupMenuItem<String>(
-        value: 'Orthodox',
-        child: ListTile(
-          onTap: () => _changeFont("Orthodox"),
-          leading: Icon(Icons.text_format),
-          title: Text('Ортодокс', style: TextStyle(fontFamily: 'Orthodox')),
-        ),
-      ),
-      PopupMenuItem<String>(
-        value: 'Turaevo',
-        child: ListTile(
-            onTap: () => _changeFont("Turaevo"),
-            leading: Icon(Icons.text_format),
-            title: Text('Тураево', style: TextStyle(fontFamily: 'Turaevo'))),
-      ),
-      PopupMenuItem<String>(
-        value: 'Grebnev',
-        child: ListTile(
-            onTap: () => _changeFont("Grebnev"),
-            leading: Icon(Icons.text_format),
-            title: Text('Гребнев', style: TextStyle(fontFamily: 'Grebnev'))),
-      ),
-      const PopupMenuDivider(),
-      PopupMenuItem(child: Text("Размер текста")),
-      PopupMenuItem(
-        child: Slider(onChanged: (value) {}, min: 1.0, max: 5.0, value: 2.5),
-      ),
+      _createFontTile('Orthodox', 'Ортодокс'),
+      _createFontTile('Turaevo', 'Тураево'),
+      _createFontTile('Grebnev', 'Гребнев'),
     ];
   }
 
@@ -126,6 +145,8 @@ class _UstavPageState extends State<UstavPage> {
         child: Icon(Icons.menu),
       );
     }
+
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -143,10 +164,11 @@ class _UstavPageState extends State<UstavPage> {
                 ),
                 actions: <Widget>[
                   PopupMenuButton<String>(
-                      icon: Icon(Icons.format_size),
-                      padding: EdgeInsets.zero,
-                      onSelected: showMenuSelection,
-                      itemBuilder: _buildMenu),
+                    icon: Icon(Icons.format_size),
+                    padding: EdgeInsets.zero,
+                    onSelected: showMenuSelection,
+                    itemBuilder: _buildMenu,
+                  ),
                   IconButton(
                     onPressed: () {
                       setState(() {
@@ -156,22 +178,23 @@ class _UstavPageState extends State<UstavPage> {
                     },
                     icon: Icon(Icons.fullscreen),
                   ),
-                  IconButton(
-                    onPressed: (){},
-                    icon: Icon(Icons.favorite)
-                  ),
-                  widget.showInfo ? IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute<Null>(
-                            builder: (BuildContext context) {
-                              return InfoPage(today: widget.day.today,);
-                          //return CalendarPage(widget.day.today.add(Duration(days: 13)));
-                        }),
-                      );
-                    },
-                    icon: Icon(Icons.info),
-                  ) : Container(),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+                  widget.showInfo
+                      ? IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute<Null>(
+                                  builder: (BuildContext context) {
+                                return InfoPage(
+                                  today: widget.day.today,
+                                );
+                                //return CalendarPage(widget.day.today.add(Duration(days: 13)));
+                              }),
+                            );
+                          },
+                          icon: Icon(Icons.info),
+                        )
+                      : Container(),
                 ],
               )
             : null,
@@ -183,7 +206,7 @@ class _UstavPageState extends State<UstavPage> {
                 SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
               });
           },
-          child: Container(color: Colors.white, child: _cstext),
+          child: Container(color: backgroundColor, child: _cstext),
         ),
       ),
     );

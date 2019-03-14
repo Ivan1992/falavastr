@@ -30,14 +30,24 @@ class ApplicationBloc implements BlocBase {
   Stream<bool> get outNewStyle => _newStyleController.stream;
   StreamSink<bool> get inNewStyle => _newStyleController.sink;
 
+  BehaviorSubject<bool> _nightModeController = BehaviorSubject<bool>(seedValue: false);
+  Stream<bool> get outNightMode => _nightModeController.stream;
+  StreamSink<bool> get inNightMode => _nightModeController.sink;
+
   ApplicationBloc() {
     _apiInfoDay();
     _changeDateController.stream.listen(_handeChangeDate);
     _updateInfoPage.stream.listen(_handleUpdateInfoPage);
     outFontFamily.listen(_handleChangeFont);
     outNewStyle.listen(_handleChangeNewStyle);
+    outNightMode.listen(_handleChangeNightMode);
     _loadInitialPrefs();
     _loadCanonsList();
+  }
+
+  _handleChangeNightMode(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("nightMode", value);
   }
 
   _handleChangeNewStyle(value) async {
@@ -54,6 +64,7 @@ class ApplicationBloc implements BlocBase {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     inFontFamily.add(prefs.getString("fontFamily") ?? 'Grebnev');
     inNewStyle.add(prefs.getBool("newStyle") ?? true);
+    inNightMode.add(prefs.getBool("nightMode") ?? false);
   }
 
   _loadCanonsList() async {
@@ -89,5 +100,6 @@ class ApplicationBloc implements BlocBase {
     _fontFamilyController.close();
     _newStyleController.close();
     _canonsListConteroller.close();
+    _nightModeController.close();
   }
 }
