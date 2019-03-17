@@ -37,7 +37,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultWeekendTextStyle = TextStyle(
-    color: Colors.teal,//Colors.pink[50],
+    color: Colors.teal, //Colors.pink[50],
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveDaysTextStyle = TextStyle(
@@ -45,7 +45,7 @@ class CalendarCarousel extends StatefulWidget {
     fontSize: 14.0,
   );
   final TextStyle defaultInactiveWeekendTextStyle = TextStyle(
-    color: Colors.teal,//Colors.pink[100].withOpacity(0.6),
+    color: Colors.teal, //Colors.pink[100].withOpacity(0.6),
     fontSize: 14.0,
   );
   final Widget defaultMarkedDateWidget = Container(
@@ -75,6 +75,7 @@ class CalendarCarousel extends StatefulWidget {
   final Color selectedDayBorderColor;
   final bool daysHaveCircularBorder;
   final Function(DateTime) onDayPressed;
+  final Function(int) onMonthChanged;
   final TextStyle weekdayTextStyle;
   final Color iconColor;
   final TextStyle headerTextStyle;
@@ -129,6 +130,7 @@ class CalendarCarousel extends StatefulWidget {
     this.selectedDayButtonColor = Colors.green,
     this.daysHaveCircularBorder,
     this.onDayPressed,
+    this.onMonthChanged,
     this.weekdayTextStyle,
     this.iconColor = Colors.blueAccent,
     this.headerTextStyle,
@@ -275,6 +277,9 @@ class _CalendarState extends State<CalendarCarousel> {
             itemCount: 3,
             onPageChanged: (index) {
               this._setDate(index);
+              if (widget.onMonthChanged != null) {
+                widget.onMonthChanged(_dates[index].month + 1);
+              }
             },
             controller: _controller,
             itemBuilder: (context, index) {
@@ -399,7 +404,7 @@ class _CalendarState extends State<CalendarCarousel> {
     );
   }
 
-  FlatButton _getDayButton(
+/*   FlatButton _getDayButton(
       DateTime now,
       int index,
       bool isSelectedDay,
@@ -482,7 +487,7 @@ class _CalendarState extends State<CalendarCarousel> {
         ],
       ),
     );
-  }
+  } */
 
   FlatButton _getDayButton2(
       DateTime now,
@@ -496,8 +501,8 @@ class _CalendarState extends State<CalendarCarousel> {
       TextStyle textStyle) {
     Color borderColor = Colors.transparent;
     Color fillColor = Colors.transparent;
-    Color textColor = null;//Colors.white;
-    
+    Color textColor = null; //Colors.white;
+
     if (DateService.isPrazdnik(now, 0)) {
       fillColor = Colors.red[800];
       borderColor = Colors.transparent;
@@ -514,7 +519,6 @@ class _CalendarState extends State<CalendarCarousel> {
     if (isSelectedDay) {
       fillColor = Colors.blue[200];
     }
-    
 
     return FlatButton(
       color: fillColor,
@@ -554,7 +558,9 @@ class _CalendarState extends State<CalendarCarousel> {
                     !isToday
                 ? (isSelectable
                     ? TextStyle(color: Colors.white) //widget.weekendTextStyle
-                    : TextStyle(color: Colors.black12)) //widget.inactiveWeekendTextStyle)
+                    : TextStyle(
+                        color:
+                            Colors.black12)) //widget.inactiveWeekendTextStyle)
                 : isToday
                     ? widget.todayTextStyle
                     : isSelectable ? textStyle : widget.inactiveDaysTextStyle,
@@ -848,9 +854,9 @@ class _CalendarState extends State<CalendarCarousel> {
         _controller.animateToPage(page,
             duration: Duration(milliseconds: 1), curve: Threshold(0.0));
       } else {
-        print('page: $page');
+        //print('page: $page');
         List<DateTime> dates = this._dates;
-        print('dateLength: ${dates.length}');
+        //print('dateLength: ${dates.length}');
         if (page == 0) {
           dates[2] = DateTime(dates[0].year, dates[0].month + 1, 1);
           dates[1] = DateTime(dates[0].year, dates[0].month, 1);
@@ -863,6 +869,11 @@ class _CalendarState extends State<CalendarCarousel> {
           page = page - 1;
         }
 
+        if (widget.onMonthChanged != null) {
+          print('month: ${dates[1].month}');
+          widget.onMonthChanged(dates[1].month);
+        }
+
         setState(() {
           _isReloadSelectedDate = false;
           _startWeekday = dates[page].weekday - firstDayOfWeek;
@@ -870,16 +881,16 @@ class _CalendarState extends State<CalendarCarousel> {
           this._dates = dates;
         });
 
-        print('dates');
-        print(this._dates);
+        /*  print('dates');
+        print(this._dates); */
 
         _controller.animateToPage(page,
             duration: Duration(milliseconds: 1), curve: Threshold(0.0));
       }
     }
 
-    print('startWeekDay: $_startWeekday');
-    print('endWeekDay: $_endWeekday');
+    /* print('startWeekDay: $_startWeekday');
+    print('endWeekDay: $_endWeekday'); */
 
     //call callback
     if (this._dates.length == 3 && widget.onCalendarChanged != null) {
@@ -975,7 +986,7 @@ class _CalendarState extends State<CalendarCarousel> {
                 ),
                 width: double.infinity,
                 height: double.infinity,
-                child: null,//event.icon,
+                child: null, //event.icon,
               )));
             } else {
               count++;

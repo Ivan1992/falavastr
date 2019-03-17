@@ -1,5 +1,3 @@
-import 'package:date_utils/date_utils.dart';
-
 import 'Event.dart';
 
 class DateService {
@@ -108,15 +106,14 @@ class DateService {
 
   static bool isPrazdnik(DateTime d, int type) {
     return prazdniki.any((x) => x.isSame(d, type));
-    /* bool b = prazdniki.any((x) => x.isSame(d));
-    if (b) return true;
-    if (type == 0) {
+  }
 
-    } */
+  static List<Event> getPrazdniki(DateTime d) {
+    return prazdniki.where((event) => event.thisMonth(d)).toList();
   }
 }
 
-List<Event> prazdniki = [
+final List<Event> prazdniki = [
   Event(type: 0, name: "Вход Господень во Иеросалим", movable: true, daysShift: -7),
   Event(type: 0, name: "Пасха", movable: true, daysShift: 0),
   Event(type: 0, name: "Светлый понедельник", movable: true, daysShift: 1),

@@ -22,10 +22,9 @@ class InfoPage extends StatefulWidget {
 }
 
 class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
-  bool _newStyle = true;
+  //bool _newStyle = true;
   AnimationController _controller, _offsetController;
-  Animation _animation, _offsetAnimation;
-  Animation _curve;
+  Animation _animation, _offsetAnimation, _curve;
 
   String _month;
   String _weekday;
@@ -47,7 +46,15 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
       parent: _offsetController,
       curve: Curves.fastOutSlowIn,
     ));
-    _setDate(true);
+    /* _setDate(true);
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+
+    StreamBuilder(
+      stream: appBloc.outNewStyle,
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.hasData) _setDate(snapshot.data);
+      },
+    ); */
   }
 
   Widget _card(DayText d) {
@@ -121,112 +128,121 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-    //appBloc.changeDate.add(widget.today);
-    return Scaffold(
-      drawer: DrawerOnly(),
-      appBar: AppBar(
-        title: Text("Дата: $_name"),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<Null>(builder: (BuildContext context) {
-                  return CalendarPage(today);
-                }),
-              );
-            },
-            icon: Icon(Icons.today),
-          )
-        ],
-      ),
-      body: StreamBuilder(
-          stream: appBloc.outInfoPage,
-          builder:
-              (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
-            if (snapshot.hasData) {
-              _offsetController.forward();
-            }
-            return AnimatedBuilder(
-                animation: _controller,
-                builder: (BuildContext context, Widget child) {
-                  return Column(
-                    children: <Widget>[
-                      Text(
-                        _animation.value.toString(),
-                        textScaleFactor: 5.0,
-                      ),
-                      Text(_month, textScaleFactor: 2.0),
-                      Text(_weekday, textScaleFactor: 2.0),
-                      StreamBuilder(
-                        stream: appBloc.outNewStyle,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<bool> snapshot) {
-                          if (snapshot.hasData) _setDate(snapshot.data);
 
-                          return snapshot.hasData
-                              ? SmartSwitch(
-                                  onChange: (val) {
-                                    appBloc.inNewStyle.add(val);
-                                    setState(() {
-                                      _newStyle = val;
-                                      _animate(val);
-                                    });
-                                  },
-                                  beginState: snapshot.data,
-                                )
-                              : Container();
-                        },
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Text("Глас $_glas"),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                IconButton(
-                                  icon: Icon(Icons.info),
-                                  onPressed: () {},
-                                ),
-                                Text("пища с рыбой"),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                          child: AnimatedBuilder(
-                        animation: _offsetController,
-                        builder: (BuildContext context, Widget child) {
-                          final double _width =
-                              MediaQuery.of(context).size.width;
-                          return snapshot.hasData
-                              ? Transform(
-                                  transform: Matrix4.translationValues(
-                                      _offsetAnimation.value * _width,
-                                      0.0,
-                                      0.0),
-                                  child: ListView(
-                                    physics: BouncingScrollPhysics(),
-                                    children: snapshot.data
-                                        .where((x) => x != null)
-                                        .map((x) => _card(x))
-                                        .toList(),
-                                  ),
-                                )
-                              : Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                        },
-                      )),
-                    ],
+    //appBloc.changeDate.add(widget.today);
+    return StreamBuilder(
+      stream: appBloc.outNewStyle,
+      builder: (BuildContext ccc, AsyncSnapshot<bool> newStyleDateBool) {
+        if (!newStyleDateBool.hasData) return Center(child:CircularProgressIndicator());
+        _setDate(newStyleDateBool.data);
+        return Scaffold(
+          drawer: DrawerOnly(),
+          appBar: AppBar(
+            title: Text("Дата: $_name"),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<Null>(builder: (BuildContext context) {
+                      return CalendarPage(today);
+                    }),
                   );
-                });
-          }),
+                },
+                icon: Icon(Icons.today),
+              )
+            ],
+          ),
+          body: StreamBuilder(
+            stream: appBloc.outInfoPage,
+            builder:
+                (BuildContext context, AsyncSnapshot<List<DayText>> snapshot) {
+              if (snapshot.hasData) {
+                _offsetController.forward();
+              }
+              return AnimatedBuilder(
+                  animation: _controller,
+                  builder: (BuildContext context, Widget child) {
+                    return Column(
+                      children: <Widget>[
+                        Text(
+                          _animation.value.toString(),
+                          textScaleFactor: 5.0,
+                        ),
+                        Text(_month, textScaleFactor: 2.0),
+                        Text(_weekday, textScaleFactor: 2.0),
+                        StreamBuilder(
+                          stream: appBloc.outNewStyle,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<bool> snapshot) {
+                            if (snapshot.hasData) _setDate(snapshot.data);
+
+                            return snapshot.hasData
+                                ? SmartSwitch(
+                                    onChange: (val) {
+                                      appBloc.inNewStyle.add(val);
+                                      setState(() {
+                                        //_newStyle = val;
+                                        _animate(val);
+                                      });
+                                    },
+                                    beginState: snapshot.data,
+                                  )
+                                : Container();
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Text("Глас $_glas"),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(Icons.info),
+                                    onPressed: () {},
+                                  ),
+                                  Text("пища с рыбой"),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                            child: AnimatedBuilder(
+                          animation: _offsetController,
+                          builder: (BuildContext context, Widget child) {
+                            final double _width =
+                                MediaQuery.of(context).size.width;
+                            return snapshot.hasData
+                                ? Transform(
+                                    transform: Matrix4.translationValues(
+                                        _offsetAnimation.value * _width,
+                                        0.0,
+                                        0.0),
+                                    child: ListView(
+                                      physics: BouncingScrollPhysics(),
+                                      children: snapshot.data
+                                          .where((x) => x != null)
+                                          .map((x) => _card(x))
+                                          .toList(),
+                                    ),
+                                  )
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                          },
+                        )),
+                      ],
+                    );
+                  });
+            },
+          ),
+        );
+      },
     );
   }
 

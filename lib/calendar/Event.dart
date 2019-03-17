@@ -10,8 +10,8 @@ class Event {
   DateTime getDate(int year) {
     if (!movable) return date;
     DateTime pasha = DateService.pasha(year);
-    DateTime prazdnik = DateTime(1);
-    if (daysShift > 0) {
+    DateTime prazdnik;
+    if (daysShift >= 0) {
       prazdnik = pasha.add(Duration(days: daysShift));
     } else {
       prazdnik = pasha.subtract(Duration(days: daysShift));
@@ -33,6 +33,15 @@ class Event {
       } else {
         return d.day == date.day && d.month == date.month;
       }
+    }
+  }
+
+  bool thisMonth(DateTime d) {
+    if (movable) {
+      DateTime date = getDate(d.year);
+      return d.month == date.month;
+    } else {
+      return d.month == date.month;
     }
   }
 
