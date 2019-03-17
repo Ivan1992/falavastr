@@ -8,13 +8,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApplicationBloc implements BlocBase {
   List<DayText> _infoPage = [];
 
-  BehaviorSubject<List<DayText>> _infoPageController =
+  StreamController<List<DayText>> _infoPageController =
       BehaviorSubject<List<DayText>>();
   StreamSink<List<DayText>> get _inInfoPage => _infoPageController.sink;
   Stream<List<DayText>> get outInfoPage => _infoPageController.stream;
 
-  BehaviorSubject<List<DayText>> _canonsListConteroller =  BehaviorSubject<List<DayText>>();
+  StreamController<List<DayText>> _canonsListConteroller =  StreamController<List<DayText>>();
   Stream<List<DayText>> get outCanonsList => _canonsListConteroller.stream;
+
+  StreamController<List<List<DayText>>> _libraryListController =  StreamController<List<List<DayText>>>();
+  Stream<List<List<DayText>>> get outLibraryList => _libraryListController.stream;
 
   StreamController _changeDateController = StreamController();
   StreamSink get changeDate => _changeDateController.sink;
@@ -101,5 +104,6 @@ class ApplicationBloc implements BlocBase {
     _newStyleController.close();
     _canonsListConteroller.close();
     _nightModeController.close();
+    _libraryListController.close();
   }
 }

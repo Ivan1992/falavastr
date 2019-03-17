@@ -78,6 +78,9 @@ flutter:
     - lib/calendar/json/svyatcy/svyatcy.json
     - lib/calendar/json/oktay/oktay.json
     - lib/calendar/json/kanonnik/kanonnik.json
+    - lib/calendar/json/library/apostol.json
+    - lib/calendar/json/library/evangelie.json
+    - lib/calendar/json/library/psalms.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

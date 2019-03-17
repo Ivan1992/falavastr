@@ -47,24 +47,37 @@ class _UstavPageState extends State<UstavPage> {
         // return object of type Dialog
         return AlertDialog(
           title: Text("Выберите часть"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: widget.day.sluzhby[_currentSluzhba].parts
-                .map(
-                  (part) => part.text != null
-                      ? FlatButton(
-                          onPressed: () {
-                            setState(() {
-                              controller.jumpTo(0.0);
-                              _cstext = CsText(part.text, controller);
-                              Navigator.of(context).pop();
-                            });
-                          },
-                          child: Text(part.name),
+          content: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: widget.day.sluzhby[_currentSluzhba].parts
+                        .map(
+                          (part) => part.text != null
+                              ? ListTile(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.jumpTo(0.0);
+                                      _cstext = CsText(part.text, controller);
+                                      Navigator.of(context).pop();
+                                    });
+                                  },
+                                  title: Center(child: Text(part.name),),
+                                )
+                              : Container(),
                         )
-                      : Container(),
-                )
-                .toList(),
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -104,25 +117,28 @@ class _UstavPageState extends State<UstavPage> {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
 
     return PopupMenuItem<String>(
-        value: text,
-        child: ListTile(
-          leading: Icon(Icons.format_color_fill),
-          title: Text(text),
-          onTap: () {
-            _changeNightMode(value);
-            setState(() {
-              backgroundColor = value ? Colors.blueGrey[900] : Colors.white;
-              _cstext = CsText(_cstext.text, _cstext.controller, value ? Colors.yellow[200] : Colors.black);
-            });
+      value: text,
+      child: ListTile(
+        leading: Icon(Icons.format_color_fill),
+        title: Text(text),
+        onTap: () {
+          _changeNightMode(value);
+          setState(() {
+            backgroundColor = value ? Colors.blueGrey[900] : Colors.white;
+            _cstext = CsText(_cstext.text, _cstext.controller,
+                value ? Colors.yellow[200] : Colors.black);
+          });
+        },
+        trailing: StreamBuilder(
+          stream: appBloc.outNightMode,
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            return (snapshot.hasData && (snapshot.data == value))
+                ? Icon(Icons.check)
+                : Container(width: 0.0, height: 0.0);
           },
-          trailing: StreamBuilder(
-            stream: appBloc.outNightMode,
-            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-              return (snapshot.hasData && (snapshot.data == value)) ? Icon(Icons.check) : Container(width: 0.0, height: 0.0);
-            },
-          ),
         ),
-      );
+      ),
+    );
   }
 
   List<PopupMenuEntry<String>> _buildMenu(BuildContext context) {

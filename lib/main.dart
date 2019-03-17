@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Алавастр',
       theme: ThemeData(
         fontFamily: "Balkara",
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.yellow, //Colors.blue,
         backgroundColor: Colors.teal,//Color(0xFF36332e),
         primaryColor: Colors.brown[200],//Color(0xFFb97b50),
         secondaryHeaderColor: Colors.pink,//Color(0xFFEFE6DD),
@@ -32,15 +32,15 @@ class MyApp extends StatelessWidget {
         buttonTheme: ButtonThemeData(
           buttonColor: Colors.black,
         ),
-        dialogBackgroundColor: Colors.deepOrange,
+        dialogBackgroundColor: Colors.brown[100],
         textTheme: TextTheme(
-          headline: TextStyle(color: Colors.deepOrange),//Colors.red), //Color(0xFFa85147)),
+          headline: TextStyle(color: Colors.brown[400]),//Colors.red), //Color(0xFFa85147)),
           caption: TextStyle(color: Colors.white), //Color(0xFFa85147)),
           body1: TextStyle(color: Colors.brown[900], fontSize: 15.0), //Color(0xFFa85147)),
           body2: TextStyle(
               color: Colors.orange), //TextStyle(color: Color(0xFFa85147)),
           title: TextStyle(color: Colors.brown[900]),//Color(0xFFa85147)),
-          subhead: TextStyle(color: Colors.lightBlue),//Color(0xFFd6ceb9)),
+          subhead: TextStyle(color: Colors.brown[900]),//Colors.lightBlue),//Color(0xFFd6ceb9)),
         ),
         iconTheme: IconThemeData(
           color: Colors.black,

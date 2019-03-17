@@ -48,11 +48,12 @@ class CanonPage extends StatelessWidget {
       ),
       onTap: () {
         Navigator.of(context).push(
-          new MaterialPageRoute<Null>(
-              builder: (BuildContext context) {
-                return UstavPage(item.sluzhby[0].parts[0].name, item, 0, false);
-              },
-              fullscreenDialog: true),
+          MaterialPageRoute<Null>(
+            builder: (BuildContext context) {
+              return UstavPage(item.sluzhby[0].parts[0].name, item, 0, false);
+            },
+            fullscreenDialog: true,
+          ),
         );
       },
     );
