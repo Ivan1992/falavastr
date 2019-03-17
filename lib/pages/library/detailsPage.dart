@@ -9,7 +9,7 @@ class DetailsPage extends StatelessWidget {
   final BOOKTYPE type;
   DetailsPage({this.type});
 
-  final apostolNames = {
+  final _apostolNames = {
     "acts": "Деяния апостольская|1-51",
     "iakov": "Иаковле послание|52-57",
     "petr1": "Петрово послание 1|58-63",
@@ -34,7 +34,28 @@ class DetailsPage extends StatelessWidget {
     "evreom": "К Евреом послание|303-335"
   };
 
-  final evangelieNames = ["От Матфея", "От Марка", "От Иоанна", "От Луки"];
+  final _evangelieNames = ["От Матфея", "От Марка", "От Иоанна", "От Луки"];
+
+  final _chasoslovChapters = [
+    "Чин вечерни",
+    "Чин павечерницы великия",
+    "Чин павечерницы средния",
+    "Чин павечерницы малыя",
+    "Полунощница повседневная",
+    "Полунощница суботная",
+    "Полунощница воскресная",
+    "Начало утрени",
+    "Час первыи",
+    "Час третии",
+    "Час шестыи",
+    "Час девятыи",
+    "Псалмы на литургии",
+    "Тропари и кондаки воскресные на осмь гласов",
+    "Тропари и кондаки дневныя",
+    "Богородичны и крестоборогодичны",
+    "Тропари и кондаки святыя Четверодесятницы",
+    "Тропари и кондаки святыя Пятидесятницы"
+  ];
 
   ListTile _buildApostolTile(String line, BuildContext context, DayText d) {
     String title = line.split("|")[0];
@@ -66,7 +87,9 @@ class DetailsPage extends StatelessWidget {
         title,
         style: TextStyle(color: Colors.white),
       ),
-      subtitle: subtitle != null ? Text(subtitle) : null,
+      subtitle: subtitle != null
+          ? Text(subtitle, style: TextStyle(color: Colors.yellow[900]))
+          : null,
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute<Null>(builder: (BuildContext context) {
@@ -91,30 +114,37 @@ class DetailsPage extends StatelessWidget {
         List<ListTile> detailsList = [];
 
         if (type == BOOKTYPE.APOSTOL) {
-          for (var i = 0; i < apostolNames.length; i++) {
+          for (var i = 0; i < _apostolNames.length; i++) {
             detailsList.add(_buildApostolTile(
-                apostolNames[apostolNames.keys.elementAt(i)],
+                _apostolNames[_apostolNames.keys.elementAt(i)],
                 context,
                 snapshot.data[i]));
           }
         } else if (type == BOOKTYPE.EVANGELIE) {
-          for (var i = 0; i < evangelieNames.length; i++) {
+          for (var i = 0; i < _evangelieNames.length; i++) {
             detailsList.add(_buildEvangelieTile(
-                evangelieNames[i], context, snapshot.data[i]));
+                _evangelieNames[i], context, snapshot.data[i]));
           }
         } else if (type == BOOKTYPE.PSALMS) {
           for (var i = 0; i < 20; i++) {
-            detailsList.add(_buildEvangelieTile(
-                "Кафизма ${i + 1}", context, snapshot.data[i]));
+            String begin =
+                snapshot.data[i].sluzhby[0].parts.first.name.split(" ")[1];
+            String end =
+                snapshot.data[i].sluzhby[0].parts.last.name.split(" ")[1];
+            detailsList.add(_buildEvangelieTile("Кафизма ${i + 1}", context,
+                snapshot.data[i], "псалмы $begin-$end"));
           }
         } else if (type == BOOKTYPE.CHASOSLOV) {
-
+          for (var i = 0; i < _chasoslovChapters.length; i++) {
+            detailsList.add(_buildEvangelieTile(
+                _chasoslovChapters[i], context, snapshot.data[i]));
+          }
         }
 
         return Scaffold(
           drawer: DrawerOnly(),
           appBar: AppBar(
-            title: Text("Выберите часть..."),
+            title: Text("Выберите главу..."),
           ),
           body: ListView.separated(
             separatorBuilder: (context, index) => Divider(

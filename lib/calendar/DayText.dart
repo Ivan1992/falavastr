@@ -28,6 +28,7 @@ class DayTextService {
   static const String _apostol = "lib/calendar/json/library/apostol.json";
   static const String _evangelie = "lib/calendar/json/library/evangelie.json";
   static const String _psalms = "lib/calendar/json/library/psalms.json";
+  static const String _chasoslov = "lib/calendar/json/library/chasoslov.json";
 
   static DateTime today = DateTime.now();
 
@@ -64,6 +65,18 @@ class DayTextService {
         List<Part> parts = [];
         value.forEach((item) {
           parts.add(Part(name: "Зачала ${item['zach']}", text: item["text"]));
+        });
+        DayText dayText =
+            DayText(title: key, sluzhby: List()..add(Sluzhba(parts: parts)));
+        listDayText.add(dayText);
+      });
+    } else if (type == BOOKTYPE.CHASOSLOV) {
+      String jsonString = await _load(_chasoslov);
+      Map<String, dynamic> parsed = json.decode(jsonString);
+      parsed.forEach((key, value) {
+        List<Part> parts = [];
+        value.forEach((item) {
+          parts.add(Part(name: "Часослов", text: item["text"]));
         });
         DayText dayText =
             DayText(title: key, sluzhby: List()..add(Sluzhba(parts: parts)));

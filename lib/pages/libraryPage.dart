@@ -113,7 +113,6 @@ class LibraryPage extends StatelessWidget {
               );
             },
           ),
-          Divider(color: Colors.black),
         ],
       ),
     );

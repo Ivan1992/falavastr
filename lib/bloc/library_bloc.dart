@@ -16,17 +16,7 @@ class LibraryBloc implements BlocBase {
   }
 
   _handleSwitchBook(value) async {
-    List<DayText> dayText;
-    if (value == BOOKTYPE.APOSTOL) {
-      dayText = await DayTextService.getBookByType(value);
-    } else if (value == BOOKTYPE.EVANGELIE) {
-      dayText = await DayTextService.getBookByType(value);
-    } else if (value == BOOKTYPE.PSALMS) {
-      dayText = await DayTextService.getBookByType(value);
-    } else if (value == BOOKTYPE.CHASOSLOV) {
-
-    }
-
+    List<DayText> dayText = await DayTextService.getBookByType(value);
     _libraryListController.sink.add(dayText);
   }
 
