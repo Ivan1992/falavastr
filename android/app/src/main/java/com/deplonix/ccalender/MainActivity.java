@@ -1,4 +1,4 @@
-package com.example.falavastr;
+package com.deplonix.ccalender;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

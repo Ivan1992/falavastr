@@ -113,7 +113,7 @@ class _CalendarPage extends State<CalendarPage> {
                 ),
               ), */
               Container(
-                height: 300.0,
+                height: 250.0,
                 child: ListView(
                   padding: EdgeInsets.only(top: 10.0),
                   physics: BouncingScrollPhysics(),
