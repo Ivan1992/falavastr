@@ -27,7 +27,7 @@ class _CalendarPage extends State<CalendarPage> {
     super.initState();
     _currentDate = widget.selected ?? DateTime.now();
     _prazdniki = DateService.getPrazdniki(_currentDate);
-    _prazdniki.sort((one, two) => one.date.day - two.date.day);
+    _prazdniki.sort((one, two) => one.getDate(_currentDate.year).day - two.getDate(_currentDate.year).day);
   }
 
   @override
