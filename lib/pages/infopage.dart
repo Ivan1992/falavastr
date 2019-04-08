@@ -116,6 +116,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
 
   _setDate(newStyle) {
     today = newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
+    if (today.hour == 23) today = today.add(Duration(hours: 1)); //in case summer time
     _month = DateFormat("MMMM", "ru").format(today);
     _name = DateFormat("dd.MM.yyyy", "ru").format(today);
     _weekday = DateFormat("EEEE", "ru").format(widget.today);

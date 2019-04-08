@@ -5,9 +5,7 @@ import 'package:falavastr/calendar/Event.dart';
 import 'package:falavastr/calendar/calendar_carousel.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/infopage.dart';
-import 'package:falavastr/smartSwitch.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class CalendarPage extends StatefulWidget {
   final DateTime selected;

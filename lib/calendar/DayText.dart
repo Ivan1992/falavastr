@@ -106,6 +106,7 @@ class DayTextService {
   static Future<DayText> getDayText(DateTime day, TEXTTYPE type) async {
     String jsonString;
     day = day.subtract(Duration(days: 13));
+    if (day.hour == 23) day = day.add(Duration(hours: 1)); //in case summer time
     today = day;
     DayText d;
 
