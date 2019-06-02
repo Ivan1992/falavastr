@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SmartSwitch extends StatefulWidget {
-  const SmartSwitch({Key key, this.onChange, this.beginState = true})
+  const SmartSwitch({Key key, this.onChange, this.beginState = true, this.leftText = "старый", this.rightText="новый"})
       : super(key: key);
 
   final ValueChanged<bool> onChange;
   final bool beginState;
+  final String leftText;
+  final String rightText;
 
   @override
   State<StatefulWidget> createState() {
@@ -122,13 +124,13 @@ class _SmartSwitchState extends State<SmartSwitch> {
                     onTap: () {
                       _switch(false);
                     },
-                    child: Text("старый", key: _keyLeft),
+                    child: Text(widget.leftText, key: _keyLeft),
                   ),
                   GestureDetector(
                     onTap: () {
                       _switch(true);
                     },
-                    child: Text("новый", key: _keyRight),
+                    child: Text(widget.rightText, key: _keyRight),
                   ),
                 ],
                 /* children: <Widget>[

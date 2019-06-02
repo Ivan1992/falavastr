@@ -2,6 +2,7 @@ import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
+import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/ustav.dart';
@@ -32,6 +33,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   String _glas;
   DateTime today;
 
+  bool _saintsRus = false;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +58,47 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
         if (snapshot.hasData) _setDate(snapshot.data);
       },
     ); */
+  }
+
+  Widget _saints(String text, String fontFamily) {
+    List<TextSpan> toReturn = [];
+
+    if (!text.contains("<r>"))
+      Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Text(text),
+      );
+
+    text.split("<r>").forEach((x) {
+      if (x.isNotEmpty) {
+        var fn = x.split("</r>");
+        var red = fn[0];
+        if (red.isNotEmpty && fn.length > 1) {
+          toReturn.add(
+              TextSpan(text: red, style: TextStyle(color: Colors.red[900])));
+        } else if (fn.length == 1) {
+          toReturn.add(TextSpan(text: red));
+        }
+
+        if (fn.length > 1) {
+          var black = fn[1];
+          if (black.isNotEmpty) {
+            toReturn.add(TextSpan(text: black));
+          }
+        }
+      }
+    });
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: RichText(
+        textAlign: TextAlign.justify,
+        textScaleFactor: fontFamily=="PTSerif"? 1.3 : 1.8,
+        text: TextSpan(
+            style: TextStyle(color: Colors.black, fontFamily: fontFamily),
+            children: toReturn),
+      ),
+    );
   }
 
   Widget _card(DayText d) {
@@ -83,7 +127,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
             )));
       }
       toReturn = Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Card(
           child: ExpansionTile(
             title: Text(d.title),
@@ -93,7 +137,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
       );
     } else {
       toReturn = Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Card(
           child: ListTile(
             onTap: () {
@@ -116,7 +160,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
 
   _setDate(newStyle) {
     today = newStyle ? widget.today : widget.today.subtract(Duration(days: 13));
-    if (today.hour == 23) today = today.add(Duration(hours: 1)); //in case summer time
+    if (today.hour == 23)
+      today = today.add(Duration(hours: 1)); //in case summer time
     _month = DateFormat("MMMM", "ru").format(today);
     _name = DateFormat("dd.MM.yyyy", "ru").format(today);
     _weekday = DateFormat("EEEE", "ru").format(widget.today);
@@ -134,7 +179,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
     return StreamBuilder(
       stream: appBloc.outNewStyle,
       builder: (BuildContext ccc, AsyncSnapshot<bool> newStyleDateBool) {
-        if (!newStyleDateBool.hasData) return Center(child:CircularProgressIndicator());
+        if (!newStyleDateBool.hasData)
+          return Center(child: CircularProgressIndicator());
         _setDate(newStyleDateBool.data);
         return Scaffold(
           drawer: DrawerOnly(),
@@ -161,91 +207,94 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                 _offsetController.forward();
               }
               return AnimatedBuilder(
-                  animation: _controller,
-                  builder: (BuildContext context, Widget child) {
-                    return Column(
-                      children: <Widget>[
-                        Text(
-                          _animation.value.toString(),
-                          textScaleFactor: 5.0,
-                        ),
-                        Text(_month, textScaleFactor: 2.0),
-                        Text(_weekday, textScaleFactor: 2.0),
-                        StreamBuilder(
-                          stream: appBloc.outNewStyle,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<bool> snapshot) {
-                            if (snapshot.hasData) _setDate(snapshot.data);
+                animation: _controller,
+                builder: (BuildContext context, Widget child) {
+                  return Column(
+                    children: <Widget>[
+                      Text(
+                        _animation.value.toString(),
+                        textScaleFactor: 5.0,
+                      ),
+                      Text(_month, textScaleFactor: 2.0),
+                      Text(_weekday, textScaleFactor: 2.0),
+                      StreamBuilder(
+                        stream: appBloc.outNewStyle,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<bool> snapshot) {
+                          if (snapshot.hasData) _setDate(snapshot.data);
 
-                            return snapshot.hasData
-                                ? SmartSwitch(
-                                    onChange: (val) {
-                                      appBloc.inNewStyle.add(val);
-                                      setState(() {
-                                        //_newStyle = val;
-                                        _animate(val);
-                                      });
-                                    },
-                                    beginState: snapshot.data,
-                                  )
-                                : Container();
-                          },
+                          return snapshot.hasData
+                              ? SmartSwitch(
+                                  onChange: (val) {
+                                    appBloc.inNewStyle.add(val);
+                                    setState(() {
+                                      //_newStyle = val;
+                                      _animate(val);
+                                    });
+                                  },
+                                  beginState: snapshot.data,
+                                )
+                              : Container();
+                        },
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Text("Глас $_glas"),
+                            IconButton(
+                                icon: Icon(Icons.translate),
+                                onPressed: () {
+                                  setState(() {
+                                    _saintsRus = !_saintsRus;
+                                  });
+                                }),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              Text("Глас $_glas"),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.info),
-                                    onPressed: () {},
-                                  ),
-                                  Text("пища с рыбой"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                            child: AnimatedBuilder(
-                          animation: _offsetController,
-                          builder: (BuildContext context, Widget child) {
-                            final double _width =
-                                MediaQuery.of(context).size.width;
-                            return snapshot.hasData
-                                ? Transform(
-                                    transform: Matrix4.translationValues(
-                                        _offsetAnimation.value * _width,
-                                        0.0,
-                                        0.0),
-                                    child: ListView(
-                                      physics: BouncingScrollPhysics(),
-                                      children: snapshot.data
+                      ),
+                      Expanded(
+                          child: AnimatedBuilder(
+                        animation: _offsetController,
+                        builder: (BuildContext context, Widget child) {
+                          final double _width =
+                              MediaQuery.of(context).size.width;
+                          return snapshot.hasData
+                              ? Transform(
+                                  transform: Matrix4.translationValues(
+                                      _offsetAnimation.value * _width,
+                                      0.0,
+                                      0.0),
+                                  child: ListView(
+                                    padding: EdgeInsets.only(top: 10),
+                                    physics: BouncingScrollPhysics(),
+                                    children: [
+                                       _saintsRus ? _saints(snapshot.data[0].sluzhby[1].parts[0].text,"PTSerif") : _saints(snapshot.data[0].sluzhby[2].parts[0].text,"Grebnev"),
+                                      ...snapshot.data
                                           .where((x) => x != null)
                                           .map((x) => _card(x))
-                                          .toList(),
-                                    ),
-                                  )
-                                : Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                          },
-                        )),
-                      ],
-                    );
-                  });
+                                          .toList()
+                                    ],
+                                  ),
+                                )
+                              : Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                        },
+                      )),
+                    ],
+                  );
+                },
+              );
             },
           ),
         );
       },
     );
   }
+
+  AnimatedBuilder _animatedBuilder() {}
 
   @override
   void dispose() {

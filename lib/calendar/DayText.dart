@@ -22,7 +22,8 @@ class DayTextService {
 
   static const String _mineaPath = "lib/calendar/json/minea/";
   static const String _oktay = "lib/calendar/json/oktay/oktay.json";
-  static const String _svyatcy = "lib/calendar/json/svyatcy/svyatcy.json";
+  static const String _output = "lib/calendar/json/svyatcy/svyatcy.json";
+  /* static const String _svyatcy = "lib/calendar/json/svyatcy/svyatcy.json"; */
   static const String _kanonnik = "lib/calendar/json/kanonnik/kanonnik.json";
 
   static const String _apostol = "lib/calendar/json/library/apostol.json";
@@ -90,8 +91,7 @@ class DayTextService {
         parsed.where((item) => item["k"] == (i + 1)).forEach((item) {
           parts.add(
             Part(
-                name: "Псалом ${parsed.indexOf(item) + 1}",
-                text: item["text"]),
+                name: "Псалом ${parsed.indexOf(item) + 1}", text: item["text"]),
           );
         });
 
@@ -112,7 +112,7 @@ class DayTextService {
 
     switch (type) {
       case TEXTTYPE.SVYATCY:
-        jsonString = await _load(_svyatcy);
+        jsonString = await _load(_output);
         d = DayText.svyatcy(json.decode(jsonString), day.day, day.month);
         d.today = day;
         return d;
@@ -162,12 +162,17 @@ class DayText {
     return DayText(sluzhby: sluzhby, title: "Октай");
   }
 
-  factory DayText.svyatcy(List<dynamic> parsedJson, int day, int month) {
-    var list = parsedJson
+  factory DayText.svyatcy(Map<String, dynamic> parsedJson, int day, int month) {
+    var list = parsedJson[month.toString()][day.toString()];
+    /* var list = parsedJson
         .where((x) => x["day"] == day && x["month"] == month)
-        .toList();
-    List<Sluzhba> sluzhby = List()..add(Sluzhba.svyatcy(list[0]));
-    return DayText(title: "Святцы", sluzhby: sluzhby);
+        .toList(); */
+    List<Sluzhba> sluzhby = [
+      Sluzhba.svyatcy(list),
+      Sluzhba.rus(list),
+      Sluzhba.csya(list)
+    ];
+    return DayText(title: "Тропари", sluzhby: sluzhby);
   }
 
   factory DayText.mineaDay(List<dynamic> parsedJson, int day) {
@@ -209,6 +214,29 @@ class Sluzhba {
                   ? "\n" + parsedJson["tropar"]
                   : "")));
 
+    return Sluzhba(parts: p);
+  }
+
+  factory Sluzhba.rus(Map<String, dynamic> parsedJson) {
+    String a = parsedJson["rus"]["oldbeliever_saint"] ?? "";
+    String b = parsedJson["rus"]["first_saint"] ?? "";
+    String c = parsedJson["rus"]["second_saint"] ?? "";
+    List<Part> p = [
+      Part(
+        name: "RUS",
+        text: (a + b + c),
+      )
+    ];
+    return Sluzhba(parts: p);
+  }
+
+  factory Sluzhba.csya(Map<String, dynamic> parsedJson) {
+    List<Part> p = [
+      Part(
+        name: "CSYA",
+        text: parsedJson["saints"],
+      ),
+    ];
     return Sluzhba(parts: p);
   }
 

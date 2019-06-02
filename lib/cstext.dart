@@ -8,7 +8,9 @@ class CsText extends StatefulWidget {
   final String text;
   final ScrollController controller;
   final Color textColor;
-  CsText(this.text, this.controller, [this.textColor = Colors.black]);
+  final bool rus;
+  CsText(this.text, this.controller,
+      [this.textColor = Colors.black, this.rus = false]);
 
   @override
   State<StatefulWidget> createState() => _CsText();
@@ -23,6 +25,7 @@ class _CsText extends State<CsText> {
   void initState() {
     super.initState();
     _loadPreferences();
+    _fontFamily = widget.rus ? 'PTSerif' : 'Grebnev';
   }
 
   _loadPreferences() async {
@@ -54,7 +57,8 @@ class _CsText extends State<CsText> {
         if (left.isNotEmpty && fn.length > 1) {
           toReturn.add(Text.rich(
             TextSpan(
-                style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
+                style:
+                    TextStyle(color: widget.textColor, fontFamily: _fontFamily),
                 children: _parseRed(left)),
             textAlign: TextAlign.center,
             textScaleFactor: _fontSize,
@@ -64,7 +68,8 @@ class _CsText extends State<CsText> {
             textAlign: TextAlign.justify,
             textScaleFactor: _fontSize,
             text: TextSpan(
-              style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
+              style:
+                  TextStyle(color: widget.textColor, fontFamily: _fontFamily),
               children: _parseRed(left),
             ),
           ));
@@ -77,7 +82,8 @@ class _CsText extends State<CsText> {
               textAlign: TextAlign.justify,
               textScaleFactor: _fontSize,
               text: TextSpan(
-                style: TextStyle(color: widget.textColor, fontFamily: _fontFamily),
+                style:
+                    TextStyle(color: widget.textColor, fontFamily: _fontFamily),
                 children: _parseRed(right),
               ),
             ));

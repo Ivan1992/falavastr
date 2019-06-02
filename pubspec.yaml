@@ -7,10 +7,10 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 3.0.0+0
+version: 3.0.0+3
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0" 
+  sdk: ">=2.2.2 <3.0.0" 
 
 dependencies:
   scoped_model: ^1.0.1
@@ -61,6 +61,9 @@ flutter:
     - family: Turaevo
       fonts:
         - asset: lib/fonts/Turaevo.ttf
+    - family: PTSerif
+      fonts:
+        - asset: lib/fonts/PTSerif-Custom.ttf
 
   assets:
     - lib/calendar/json/minea/yanvar.json
