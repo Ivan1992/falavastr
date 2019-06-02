@@ -1,18 +1,14 @@
 import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
-import 'package:falavastr/calendar/DateService.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/pages/aboutPage.dart';
-import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/canonPage.dart';
 import 'package:falavastr/pages/libraryPage.dart';
+import 'package:falavastr/pages/rss/rssfeed.dart';
 import 'package:falavastr/pages/settingsPage.dart';
 import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'dart:async';
-
-import 'package:intl/intl.dart';
 
 class DrawerOnly extends StatelessWidget {
   final bool expanded;
@@ -107,6 +103,8 @@ class DrawerOnly extends StatelessWidget {
                   null, LibraryPage()), //stars
               _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted), 0.0,
                   null, CanonPage()),
+              _getDummy(ctxt, "Новости РПСЦ", Icon(Icons.rss_feed), 0.0, null,
+                  RSSFeed()),
               _getDummy(ctxt, "Настройки", Icon(Icons.settings), 0.0, null,
                   SettigsPage()),
               _getDummy(ctxt, "О программе", Icon(Icons.info), 0.0, null,
