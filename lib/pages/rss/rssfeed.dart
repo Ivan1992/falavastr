@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,8 +13,17 @@ class RSSFeed extends StatelessWidget {
     "http://rpso.ru/feed/",
     "http://kirovold43.ru/feed/",
     "http://ostozhenka-hram.ru/feed/",
+    "https://lo-alexey.livejournal.com/data/rss",
+    "https://o-apankratov.livejournal.com/data/rss"
   ];
-  List<String> shortNames = ["РПСЦ", "РЖЕВ", "КИРОВ", "ОСТОЖЕНКА", "ЛОПАТИН", "ПАНКРАТОВ"];
+  List<String> shortNames = [
+    "РПСЦ",
+    "РЖЕВ",
+    "КИРОВ",
+    "ОСТОЖЕНКА",
+    "ЛОПАТИН",
+    "ПАНКРАТОВ"
+  ];
   List<Color> colors = [
     Colors.blue[100],
     Colors.orange[100],
@@ -25,11 +35,10 @@ class RSSFeed extends StatelessWidget {
   List<RssWrapper> fullFeed = [];
   List<Card> fullFeedCards = [];
 
-  RSSFeed() {
-  }
+  RSSFeed() {}
 
   Widget _card(RssItem item, Color bg, String source, String link) {
-    String desc = item.description.replaceAll(RegExp(r"<[^>]*>"),"");
+    String desc = item.description.replaceAll(RegExp(r"<[^>]*>"), "");
     int len = desc.length;
     int max = 90;
     DateFormat sourceFormat = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
@@ -55,7 +64,6 @@ class RSSFeed extends StatelessWidget {
               ],
             ),
             title: Text(item.title),
-            isThreeLine: true,
             subtitle: len > 0
                 ? (len > max
                     ? Text(desc.substring(0, max + 1) + "...")
@@ -83,18 +91,15 @@ class RSSFeed extends StatelessWidget {
   }
 
   Future<List<RssWrapper>> _getFeedItems(String url, int index) async {
-    Map<String,String> headers = {"Keep-Alive": "timeout=5"};
-    return client.get(url, headers: headers).then((response) {
-      return response.body;
-    }).then((bodyString) {
-      var channel = RssFeed.parse(bodyString);
-      DateFormat format = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
-      return channel.items
-          .map((item) => RssWrapper(
-              _card(item, colors[index], shortNames[index], channel.link),
-              format.parse(item.pubDate)))
-          .toList();
-    });
+    Response response = await client.get(url);
+    String bodyString = response.body;
+    var channel = RssFeed.parse(bodyString);
+    DateFormat format = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
+    return channel.items
+        .map((item) => RssWrapper(
+            _card(item, colors[index], shortNames[index], channel.link),
+            format.parse(item.pubDate)))
+        .toList();
   }
 
   Future<List<RssWrapper>> _gatherFeeds() async {
