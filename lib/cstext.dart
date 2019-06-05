@@ -102,8 +102,10 @@ class _CsText extends State<CsText> {
         var fn = x.split(r"</r>");
         var red = fn[0];
         if (red.isNotEmpty && fn.length > 1) {
-          toReturn
-              .add(TextSpan(text: red, style: TextStyle(color: Colors.red)));
+          toReturn.add(TextSpan(
+              text: red,
+              style:
+                  TextStyle(color: Colors.red[800], fontFamily: _fontFamily)));
         } else if (fn.length == 1) {
           toReturn.add(TextSpan(text: red));
         }
@@ -111,7 +113,10 @@ class _CsText extends State<CsText> {
         if (fn.length > 1) {
           var black = fn[1];
           if (black.isNotEmpty) {
-            toReturn.add(TextSpan(text: black));
+            toReturn.add(TextSpan(
+                text: black,
+                style:
+                    TextStyle(color: Colors.black, fontFamily: _fontFamily)));
           }
         }
       }

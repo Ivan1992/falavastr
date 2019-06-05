@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         dialogBackgroundColor: Colors.brown[100],
         textTheme: TextTheme(
           headline: TextStyle(color: Colors.brown[400]),//Colors.red), //Color(0xFFa85147)),
-          caption: TextStyle(color: Colors.white), //Color(0xFFa85147)),
+          caption: TextStyle(color: Colors.grey[600], fontFamily: "PTSerif"), //Color(0xFFa85147)),
           body1: TextStyle(color: Colors.brown[900], fontSize: 15.0), //Color(0xFFa85147)),
           body2: TextStyle(
               color: Colors.orange), //TextStyle(color: Color(0xFFa85147)),

@@ -29,6 +29,9 @@ class _UstavPageState extends State<UstavPage> {
       ScrollController(initialScrollOffset: 0.0);
   Color backgroundColor = Colors.white;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  VoidCallback _showBottomSheetCallback;
+
   void showMenuSelection(String value) {
     print('You selected: $value');
   }
@@ -38,6 +41,43 @@ class _UstavPageState extends State<UstavPage> {
     super.initState();
     _cstext = CsText(
         widget.day.sluzhby[0].parts[widget.initialPart].text, controller);
+    _showBottomSheetCallback = _showBottomSheet;
+  }
+
+  void _showBottomSheet() {
+    setState(() {
+      // disable the button
+      _showBottomSheetCallback = null;
+    });
+    _scaffoldKey.currentState
+        .showBottomSheet<void>((BuildContext context) {
+          final ThemeData themeData = Theme.of(context);
+          return Container(
+            decoration: BoxDecoration(
+                border:
+                    Border(top: BorderSide(color: themeData.disabledColor))),
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Text(
+                'This is a Material persistent bottom sheet. Drag downwards to dismiss it.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: themeData.accentColor,
+                  fontSize: 24.0,
+                ),
+              ),
+            ),
+          );
+        })
+        .closed
+        .whenComplete(() {
+          if (mounted) {
+            setState(() {
+              // re-enable the button
+              _showBottomSheetCallback = _showBottomSheet;
+            });
+          }
+        });
   }
 
   void _showDialog() {
@@ -69,7 +109,9 @@ class _UstavPageState extends State<UstavPage> {
                                       Navigator.of(context).pop();
                                     });
                                   },
-                                  title: Center(child: Text(part.name),),
+                                  title: Center(
+                                    child: Text(part.name),
+                                  ),
                                 )
                               : Container(),
                         )
@@ -167,6 +209,7 @@ class _UstavPageState extends State<UstavPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        key: _scaffoldKey,
         drawer: DrawerOnly(true),
         floatingActionButton: !_fullscreen ? fab : null,
         appBar: !_fullscreen
@@ -194,7 +237,10 @@ class _UstavPageState extends State<UstavPage> {
                     },
                     icon: Icon(Icons.fullscreen),
                   ),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: _showBottomSheetCallback,
+                  ),
                   widget.showInfo
                       ? IconButton(
                           onPressed: () {

@@ -48,7 +48,7 @@ class RSSFeed extends StatelessWidget {
   Widget _card(RssItem item, Color bg, String source, String link) {
     String desc = item.description.replaceAll(RegExp(r"<[^>]*>"), "");
     int len = desc.length;
-    int max = 90;
+    int max = 180;
     DateFormat sourceFormat = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
     DateTime d = sourceFormat.parse(item.pubDate);
     DateFormat outputFormat = DateFormat("dd.MM.yyyy");
@@ -76,8 +76,9 @@ class RSSFeed extends StatelessWidget {
               title: Text(item.title),
               subtitle: len > 0
                   ? (len > max
-                      ? Text(desc.substring(0, max + 1) + "...")
-                      : Text(desc))
+                      ? Text(desc.substring(0, max + 1) + "...",
+                          style: TextStyle(fontFamily: "PTSerif"))
+                      : Text(desc, style: TextStyle(fontFamily: "PTSerif")))
                   : null,
             ),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [

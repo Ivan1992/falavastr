@@ -16,6 +16,15 @@ class ApplicationBloc implements BlocBase {
   StreamController<List<DayText>> _canonsListConteroller =  StreamController<List<DayText>>();
   Stream<List<DayText>> get outCanonsList => _canonsListConteroller.stream;
 
+  StreamController<List<DayText>> _favController = StreamController<List<DayText>>();
+  Stream<List<DayText>> get outFavs => _favController.stream;
+
+  StreamController _addFavController = StreamController();
+  StreamSink get addFav => _addFavController.sink;
+
+  StreamController _removeFavController = StreamController();
+  StreamSink get remove => _addFavController.sink;
+
   StreamController<List<List<DayText>>> _libraryListController =  StreamController<List<List<DayText>>>();
   Stream<List<List<DayText>>> get outLibraryList => _libraryListController.stream;
 
@@ -105,5 +114,8 @@ class ApplicationBloc implements BlocBase {
     _canonsListConteroller.close();
     _nightModeController.close();
     _libraryListController.close();
+    _favController.close();
+    _addFavController.close();
+    _removeFavController.close();
   }
 }
