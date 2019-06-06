@@ -8,42 +8,36 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../drawer.dart';
 
-class RSSFeed extends StatelessWidget {
-  final client = new http.Client();
-  List<String> feedUrls = [
-    "http://rpsc.ru/feed/",
-    "http://rpso.ru/feed/",
-    "http://kirovold43.ru/feed/",
-    "http://ostozhenka-hram.ru/feed/",
-    "https://lo-alexey.livejournal.com/data/rss",
-    "https://o-apankratov.livejournal.com/data/rss",
-    "https://nbobkov.livejournal.com/data/rss",
-    "https://ierej-vadim.livejournal.com/data/rss",
-  ];
-  List<String> shortNames = [
-    "РПСЦ",
-    "РЖЕВ",
-    "КИРОВ",
-    "ОСТОЖЕНКА",
-    "ЛОПАТИН",
-    "ПАНКРАТОВ",
-    "БОБКОВ",
-    "КОРОВИН"
-  ];
-  List<Color> colors = [
-    Colors.blue[100],
-    Colors.orange[100],
-    Colors.purple[100],
-    Colors.green[100],
-    Colors.yellow[100],
-    Colors.red[100],
-    Colors.teal[100],
-    Colors.indigo[100]
-  ];
-  List<RssWrapper> fullFeed = [];
-  List<Card> fullFeedCards = [];
+class RSSFeed extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _RSSFeedState();
+}
 
-  RSSFeed() {}
+class _RSSFeedState extends State<RSSFeed> {
+  final client = new http.Client();
+
+  final List<RSSChannelWrapper> feeds = [
+    RSSChannelWrapper("http://rpsc.ru/feed/", "РПСЦ", "Официальный сайт РПСЦ",
+        Colors.blue[50]),
+    RSSChannelWrapper("http://rpso.ru/feed/", "РЖЕВ", "Сайт общины г. Ржева",
+        Colors.indigo[50]),
+    RSSChannelWrapper("http://kirovold43.ru/feed/", "КИРОВ",
+        "Сайт общины г. Кирова", Colors.purple[50]),
+    RSSChannelWrapper("http://ostozhenka-hram.ru/feed/", "ОСТОЖЕНКА",
+        "Сайт общины г. Москвы", Colors.green[50]),
+    RSSChannelWrapper("https://izdrevle.ru/feed", "ИЗДРЕВЛЕ",
+        "Сайт общины г. Москвы", Colors.red[50]),
+    RSSChannelWrapper("https://lo-alexey.livejournal.com/data/rss", "ЛОПАТИН",
+        "ЖЖ о.Алексея Лопатина", Colors.yellow[50], false),
+    RSSChannelWrapper("https://o-apankratov.livejournal.com/data/rss",
+        "ПАНКРАТОВ", "ЖЖ о.Александра Панкратова", Colors.teal[50], false),
+    RSSChannelWrapper("https://nbobkov.livejournal.com/data/rss", "БОБКОВ",
+        "ЖЖ о.Николы Бобкова", Colors.indigo[50], false),
+    RSSChannelWrapper("https://ierej-vadim.livejournal.com/data/rss", "КОРОВИН",
+        "ЖЖ о.Вадима Коровина", Colors.brown[50], false),
+  ];
+
+  final List<Card> fullFeedCards = [];
 
   Widget _card(RssItem item, Color bg, String source, String link) {
     String desc = item.description.replaceAll(RegExp(r"<[^>]*>"), "");
@@ -105,26 +99,57 @@ class RSSFeed extends StatelessWidget {
   }
 
   Future<List<RssWrapper>> _getFeedItems(String url, int index) async {
-    Response response = await client.get(url);
-    String bodyString = response.body;
-    var channel = RssFeed.parse(bodyString);
-    DateFormat format = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
-    return channel.items
-        .map((item) => RssWrapper(
-            _card(item, colors[index], shortNames[index], channel.link),
-            format.parse(item.pubDate)))
-        .toList();
+    try {
+      Response response = await client.get(url);
+      String bodyString = response.body;
+      var channel = RssFeed.parse(bodyString);
+      DateFormat format = DateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
+      return channel.items
+          .map((item) => RssWrapper(
+              _card(item, feeds[index].color, feeds[index].shortName,
+                  channel.link),
+              format.parse(item.pubDate)))
+          .toList();
+    } catch (e) {
+      print(e);
+    }
+    return [];
   }
 
   Future<List<RssWrapper>> _gatherFeeds() async {
+    List<RssWrapper> fullFeed = [];
     List<Future<List<RssWrapper>>> futures = [];
-    for (int i = 0; i < feedUrls.length; i++) {
-      futures.add(_getFeedItems(feedUrls[i], i));
+    for (int i = 0; i < feeds.length; i++) {
+      futures.add(_getFeedItems(feeds[i].url, i));
     }
     List<List<RssWrapper>> response = await Future.wait(futures);
     fullFeed = response.expand((i) => i).toList();
     fullFeed.sort((b, a) => a.date.compareTo(b.date));
     return fullFeed;
+  }
+
+  List<PopupMenuEntry> _buildMenu(BuildContext context) {
+    return <PopupMenuEntry>[
+      ...feeds
+          .map(
+            (feed) => PopupMenuItem(
+                  child: Row(
+                    children: <Widget>[
+                      Checkbox(
+                        value: feed.enabled,
+                        onChanged: (val) {
+                          setState(() {
+                            feed.enabled = val;
+                          });
+                        },
+                      ),
+                      Text(feed.longName),
+                    ],
+                  ),
+                ),
+          )
+          .toList()
+    ];
   }
 
   @override
@@ -135,6 +160,14 @@ class RSSFeed extends StatelessWidget {
       drawer: DrawerOnly(),
       appBar: AppBar(
         title: Text("Новости РПСЦ"),
+        actions: <Widget>[
+          PopupMenuButton(
+            icon: Icon(Icons.list),
+            padding: EdgeInsets.zero,
+            /* onSelected: showMenuSelection, */
+            itemBuilder: _buildMenu,
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: _gatherFeeds(),
@@ -160,4 +193,15 @@ class RssWrapper {
   final DateTime date;
 
   RssWrapper(this.card, this.date);
+}
+
+class RSSChannelWrapper {
+  final String url;
+  final String shortName;
+  final String longName;
+  final Color color;
+  bool enabled;
+
+  RSSChannelWrapper(this.url, this.shortName, this.longName, this.color,
+      [this.enabled = true]);
 }
