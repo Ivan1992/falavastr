@@ -53,20 +53,13 @@ class _UstavPageState extends State<UstavPage> {
         .showBottomSheet<void>((BuildContext context) {
           final ThemeData themeData = Theme.of(context);
           return Container(
+            height: MediaQuery.of(context).size.height * 0.5,
             decoration: BoxDecoration(
                 border:
                     Border(top: BorderSide(color: themeData.disabledColor))),
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Text(
-                'This is a Material persistent bottom sheet. Drag downwards to dismiss it.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: themeData.accentColor,
-                  fontSize: 24.0,
-                ),
-              ),
-            ),
+                padding: EdgeInsets.only(top: 20),
+                child: Container(color: backgroundColor, child: _cstext)),
           );
         })
         .closed

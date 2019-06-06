@@ -16,6 +16,8 @@ class RSSFeed extends StatefulWidget {
 class _RSSFeedState extends State<RSSFeed> {
   final client = new http.Client();
 
+  List<RssWrapper> fullFeed = [];
+
   final List<RSSChannelWrapper> feeds = [
     RSSChannelWrapper("http://rpsc.ru/feed/", "РПСЦ", "Официальный сайт РПСЦ",
         Colors.blue[50]),
@@ -26,7 +28,7 @@ class _RSSFeedState extends State<RSSFeed> {
     RSSChannelWrapper("http://ostozhenka-hram.ru/feed/", "ОСТОЖЕНКА",
         "Сайт общины г. Москвы", Colors.green[50]),
     RSSChannelWrapper("https://izdrevle.ru/feed", "ИЗДРЕВЛЕ",
-        "Сайт общины г. Москвы", Colors.red[50]),
+        "Сайт общины г. Ростова", Colors.red[50]),
     RSSChannelWrapper("https://lo-alexey.livejournal.com/data/rss", "ЛОПАТИН",
         "ЖЖ о.Алексея Лопатина", Colors.yellow[50], false),
     RSSChannelWrapper("https://o-apankratov.livejournal.com/data/rss",
@@ -37,7 +39,11 @@ class _RSSFeedState extends State<RSSFeed> {
         "ЖЖ о.Вадима Коровина", Colors.brown[50], false),
   ];
 
-  final List<Card> fullFeedCards = [];
+  /*  @override
+  void initState() {
+    super.initState();
+    feeds.addAll();
+  } */
 
   Widget _card(RssItem item, Color bg, String source, String link) {
     String desc = item.description.replaceAll(RegExp(r"<[^>]*>"), "");
@@ -79,12 +85,6 @@ class _RSSFeedState extends State<RSSFeed> {
               Text(link
                   .replaceAll(RegExp(r"https?://"), "")
                   .replaceAll("/", "")),
-              /* FlatButton(
-                child: const Text('ЧИТАТЬ'),
-                onPressed: () {
-                  _launchURL(item.link);
-                },
-              ), */
             ])
           ],
         ),
@@ -117,10 +117,11 @@ class _RSSFeedState extends State<RSSFeed> {
   }
 
   Future<List<RssWrapper>> _gatherFeeds() async {
-    List<RssWrapper> fullFeed = [];
     List<Future<List<RssWrapper>>> futures = [];
     for (int i = 0; i < feeds.length; i++) {
-      futures.add(_getFeedItems(feeds[i].url, i));
+      if (feeds[i].enabled) {
+        futures.add(_getFeedItems(feeds[i].url, i));
+      }
     }
     List<List<RssWrapper>> response = await Future.wait(futures);
     fullFeed = response.expand((i) => i).toList();
@@ -128,44 +129,36 @@ class _RSSFeedState extends State<RSSFeed> {
     return fullFeed;
   }
 
-  List<PopupMenuEntry> _buildMenu(BuildContext context) {
-    return <PopupMenuEntry>[
-      ...feeds
-          .map(
-            (feed) => PopupMenuItem(
-                  child: Row(
-                    children: <Widget>[
-                      Checkbox(
-                        value: feed.enabled,
-                        onChanged: (val) {
-                          setState(() {
-                            feed.enabled = val;
-                          });
-                        },
-                      ),
-                      Text(feed.longName),
-                    ],
-                  ),
-                ),
-          )
-          .toList()
-    ];
+  void _showList() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(title: Text('Новостные каналы'), children: [
+            MyDialogClass(
+              feeds: feeds,
+            ),
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ]);
+        });
+    fullFeed = [];
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    //fullFeed.sort((a, b) => DateTime(a.pubDate))
-
     return Scaffold(
       drawer: DrawerOnly(),
       appBar: AppBar(
         title: Text("Новости РПСЦ"),
         actions: <Widget>[
-          PopupMenuButton(
+          IconButton(
             icon: Icon(Icons.list),
-            padding: EdgeInsets.zero,
-            /* onSelected: showMenuSelection, */
-            itemBuilder: _buildMenu,
+            onPressed: _showList,
           ),
         ],
       ),
@@ -204,4 +197,36 @@ class RSSChannelWrapper {
 
   RSSChannelWrapper(this.url, this.shortName, this.longName, this.color,
       [this.enabled = true]);
+}
+
+class MyDialogClass extends StatefulWidget {
+  MyDialogClass({Key key, this.feeds}) : super(key: key);
+
+  final List<RSSChannelWrapper> feeds;
+
+  @override
+  _MyDialogClassState createState() => _MyDialogClassState();
+}
+
+class _MyDialogClassState extends State<MyDialogClass> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: widget.feeds
+          .map(
+            (feed) => CheckboxListTile(
+                  title: Text(feed.longName),
+                  value: feed.enabled,
+                  onChanged: (val) {
+                    setState(() {
+                      feed.enabled = val;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+          )
+          .toList(),
+    );
+  }
 }
