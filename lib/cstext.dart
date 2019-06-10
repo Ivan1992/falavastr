@@ -18,6 +18,18 @@ class CsText extends StatefulWidget {
     return CsText(this.text, sc, this.textColor, this.rus);
   }
 
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'offset': controller.initialScrollOffset ?? 0.0,
+        'color': textColor.value,
+      };
+
+  CsText.fromJson(Map<String, dynamic> json)
+      : text = json['text'],
+        controller = ScrollController(initialScrollOffset: json['offset']),
+        textColor = Color(json['color']),
+        rus = false;
+
   @override
   State<StatefulWidget> createState() => _CsText();
 }
@@ -114,8 +126,8 @@ class _CsText extends State<CsText> {
         if (red.isNotEmpty && fn.length > 1) {
           toReturn.add(TextSpan(
               text: red,
-              style:
-                  TextStyle(color: Colors.red[800])));//, fontFamily: _fontFamily)));
+              style: TextStyle(
+                  color: Colors.red[800]))); //, fontFamily: _fontFamily)));
         } else if (fn.length == 1) {
           toReturn.add(TextSpan(text: red));
         }
@@ -125,8 +137,8 @@ class _CsText extends State<CsText> {
           if (black.isNotEmpty) {
             toReturn.add(TextSpan(
                 text: black,
-                style:
-                    TextStyle(color: Colors.black)));//, fontFamily: _fontFamily)));
+                style: TextStyle(
+                    color: Colors.black))); //, fontFamily: _fontFamily)));
           }
         }
       }

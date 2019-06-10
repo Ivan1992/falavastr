@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:rxdart/rxdart.dart';
@@ -67,6 +68,7 @@ class ApplicationBloc implements BlocBase {
     _removeFavController.stream.listen(_handleRemoveFav);
     _loadInitialPrefs();
     _loadCanonsList();
+    _loadInitialFavs();
   }
 
   _handleRemoveFav(value) async {
@@ -77,10 +79,24 @@ class ApplicationBloc implements BlocBase {
     } catch (e) {}
   }
 
+  _loadInitialFavs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String str = prefs.getString("favourites")??"[]";
+    List<String> json = jsonDecode(str);
+    if (json.length > 0) {
+      List<CsText> favs = json.map((item) => CsText.fromJson(jsonDecode(item))).toList();
+      _inFavs.add(favs);
+    }
+  }
+
   _handleAddFav(value) async {
     List<CsText> favs = await outFavs.first;
     favs.add(value);
     _inFavs.add(favs);
+    List<String> json = favs.map((item) => item.toJson().toString()).toList();
+    String str = jsonEncode(json);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("favourites", str);
   }
 
   _handleChangeNightMode(value) async {
