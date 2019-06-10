@@ -16,7 +16,7 @@ class ApplicationBloc implements BlocBase {
   Stream<List<DayText>> get outInfoPage => _infoPageController.stream;
 
   StreamController<List<DayText>> _canonsListConteroller =
-      StreamController<List<DayText>>.broadcast();
+      BehaviorSubject<List<DayText>>();
   Stream<List<DayText>> get outCanonsList => _canonsListConteroller.stream;
 
   StreamController<List<CsText>> _favController =
