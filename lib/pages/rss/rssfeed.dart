@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,6 +18,7 @@ class _RSSFeedState extends State<RSSFeed> {
   final client = new http.Client();
 
   List<RssWrapper> fullFeed = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final List<RSSChannelWrapper> feeds = [
     RSSChannelWrapper("http://rpsc.ru/feed/", "РПСЦ", "Официальный сайт РПСЦ",
@@ -38,12 +40,6 @@ class _RSSFeedState extends State<RSSFeed> {
     RSSChannelWrapper("https://ierej-vadim.livejournal.com/data/rss", "КОРОВИН",
         "ЖЖ о.Вадима Коровина", Colors.brown[50], false),
   ];
-
-  /*  @override
-  void initState() {
-    super.initState();
-    feeds.addAll();
-  } */
 
   Widget _card(RssItem item, Color bg, String source, String link) {
     String desc = item.description.replaceAll(RegExp(r"<[^>]*>"), "");
@@ -117,6 +113,13 @@ class _RSSFeedState extends State<RSSFeed> {
   }
 
   Future<List<RssWrapper>> _gatherFeeds() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> enabled = prefs.getStringList("rss") ??
+        ["РПСЦ", "РЖЕВ", "ИЗДРЕВЛЕ", "КИРОВ", "ОСТОЖЕНКА"];
+    feeds.forEach((feed) {
+      feed.enabled = enabled.contains(feed.shortName);
+    });
+
     List<Future<List<RssWrapper>>> futures = [];
     for (int i = 0; i < feeds.length; i++) {
       if (feeds[i].enabled) {
@@ -130,6 +133,7 @@ class _RSSFeedState extends State<RSSFeed> {
   }
 
   void _showList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -145,13 +149,25 @@ class _RSSFeedState extends State<RSSFeed> {
             )
           ]);
         });
-    fullFeed = [];
     setState(() {});
+
+    List<String> enabled = [];
+    feeds.forEach((feed) {
+      if (feed.enabled) {
+        enabled.add(feed.shortName);
+      }
+    });
+    prefs.setStringList("rss", enabled);
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text("Загрузка..."),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       drawer: DrawerOnly(),
       appBar: AppBar(
         title: Text("Новости РПСЦ"),

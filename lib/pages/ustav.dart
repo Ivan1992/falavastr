@@ -28,6 +28,7 @@ class _UstavPageState extends State<UstavPage> {
   final ScrollController controller =
       ScrollController(initialScrollOffset: 0.0);
   Color backgroundColor = Colors.white;
+  double _height = 0.5;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback _showBottomSheetCallback;
@@ -46,27 +47,25 @@ class _UstavPageState extends State<UstavPage> {
 
   void _showBottomSheet() {
     setState(() {
-      // disable the button
       _showBottomSheetCallback = null;
     });
+
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+    appBloc.addFav.add(_cstext.copy());
+
     _scaffoldKey.currentState
         .showBottomSheet<void>((BuildContext context) {
           final ThemeData themeData = Theme.of(context);
-          return Container(
-            height: MediaQuery.of(context).size.height * 0.5,
-            decoration: BoxDecoration(
-                border:
-                    Border(top: BorderSide(color: themeData.disabledColor))),
-            child: Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Container(color: backgroundColor, child: _cstext)),
+          return BSClass(
+            themeData: themeData,
+            backgroundColor: backgroundColor,
+            cstext: _cstext,
           );
         })
         .closed
         .whenComplete(() {
           if (mounted) {
             setState(() {
-              // re-enable the button
               _showBottomSheetCallback = _showBottomSheet;
             });
           }
@@ -184,6 +183,7 @@ class _UstavPageState extends State<UstavPage> {
       _createFontTile('Orthodox', 'Ортодокс'),
       _createFontTile('Turaevo', 'Тураево'),
       _createFontTile('Grebnev', 'Гребнев'),
+      const PopupMenuDivider(),
     ];
   }
 
@@ -276,5 +276,105 @@ class _UstavPageState extends State<UstavPage> {
       return Future(() => false);
     }
     return Future(() => true);
+  }
+}
+
+class BSClass extends StatefulWidget {
+  final ThemeData themeData;
+  final CsText cstext;
+  final Color backgroundColor;
+
+  const BSClass({Key key, this.themeData, this.cstext, this.backgroundColor})
+      : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _BSClassState();
+}
+
+class _BSClassState extends State<BSClass> with TickerProviderStateMixin  {
+  double _height = 0.6;
+  TabController _controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * _height,
+      decoration: BoxDecoration(
+          border:
+              Border(top: BorderSide(color: widget.themeData.disabledColor))),
+      child: StreamBuilder(
+            stream: appBloc.outFavs,
+            builder: (BuildContext ctx, AsyncSnapshot<List<CsText>> snapshot) {
+              if (!snapshot.hasData)
+                return Center(child: CircularProgressIndicator());
+              if (snapshot.data != null && snapshot.data.length == 0)
+                return Center(child: Text("нет закладок"));
+
+              _controller =
+                  TabController(vsync: this, length: snapshot.data.length);
+
+              List<Tab> tabHeader = [];
+              for (int i = 0; i < snapshot.data.length; i++) {
+                tabHeader.add(Tab(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("закладка ${i + 1}", style: TextStyle(height: 1.0)),
+                      IconButton(
+                        onPressed: () {
+                          appBloc.removeFav.add(i);
+                          /* snapshot.data.removeAt(i);
+                          setState((){}); */
+                        },
+                        icon: Icon(Icons.close),
+                      )
+                    ],
+                  ),
+                ));
+              }
+
+              return Container(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      /* height: 10, */
+                      child: TabBar(
+                        controller: _controller,
+                        isScrollable: true,
+                        tabs: tabHeader,
+                      ),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _controller,
+                        children: snapshot.data
+                            .map((item) => Container(
+                                color: widget.backgroundColor, child: item))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      /* Column(
+        children: [
+          Container(
+            height: 30.0,
+            child: Icon(Icons.menu),
+          ),
+        ],
+      ), */
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

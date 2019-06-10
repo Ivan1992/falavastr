@@ -5,6 +5,8 @@ import 'package:falavastr/calendar/DayText.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../cstext.dart';
+
 class ApplicationBloc implements BlocBase {
   List<DayText> _infoPage = [];
 
@@ -13,20 +15,25 @@ class ApplicationBloc implements BlocBase {
   StreamSink<List<DayText>> get _inInfoPage => _infoPageController.sink;
   Stream<List<DayText>> get outInfoPage => _infoPageController.stream;
 
-  StreamController<List<DayText>> _canonsListConteroller =  StreamController<List<DayText>>();
+  StreamController<List<DayText>> _canonsListConteroller =
+      StreamController<List<DayText>>.broadcast();
   Stream<List<DayText>> get outCanonsList => _canonsListConteroller.stream;
 
-  StreamController<List<DayText>> _favController = StreamController<List<DayText>>();
-  Stream<List<DayText>> get outFavs => _favController.stream;
+  StreamController<List<CsText>> _favController =
+      BehaviorSubject<List<CsText>>(seedValue: []);
+  Stream<List<CsText>> get outFavs => _favController.stream;
+  StreamSink<List<CsText>> get _inFavs => _favController.sink;
 
-  StreamController _addFavController = StreamController();
+  StreamController _addFavController = StreamController.broadcast();
   StreamSink get addFav => _addFavController.sink;
 
-  StreamController _removeFavController = StreamController();
-  StreamSink get remove => _addFavController.sink;
+  StreamController _removeFavController = StreamController.broadcast();
+  StreamSink get removeFav => _removeFavController.sink;
 
-  StreamController<List<List<DayText>>> _libraryListController =  StreamController<List<List<DayText>>>();
-  Stream<List<List<DayText>>> get outLibraryList => _libraryListController.stream;
+  StreamController<List<List<DayText>>> _libraryListController =
+      StreamController<List<List<DayText>>>();
+  Stream<List<List<DayText>>> get outLibraryList =>
+      _libraryListController.stream;
 
   StreamController _changeDateController = StreamController();
   StreamSink get changeDate => _changeDateController.sink;
@@ -34,15 +41,18 @@ class ApplicationBloc implements BlocBase {
   StreamController _updateInfoPage = StreamController();
   StreamSink get updateInfoPage => _updateInfoPage.sink;
 
-  BehaviorSubject<String> _fontFamilyController = BehaviorSubject<String>(seedValue: "Grebnev");
+  BehaviorSubject<String> _fontFamilyController =
+      BehaviorSubject<String>(seedValue: "Grebnev");
   Stream<String> get outFontFamily => _fontFamilyController.stream;
   StreamSink<String> get inFontFamily => _fontFamilyController.sink;
 
-  BehaviorSubject<bool> _newStyleController = BehaviorSubject<bool>(seedValue: true);
+  BehaviorSubject<bool> _newStyleController =
+      BehaviorSubject<bool>(seedValue: true);
   Stream<bool> get outNewStyle => _newStyleController.stream;
   StreamSink<bool> get inNewStyle => _newStyleController.sink;
 
-  BehaviorSubject<bool> _nightModeController = BehaviorSubject<bool>(seedValue: false);
+  BehaviorSubject<bool> _nightModeController =
+      BehaviorSubject<bool>(seedValue: false);
   Stream<bool> get outNightMode => _nightModeController.stream;
   StreamSink<bool> get inNightMode => _nightModeController.sink;
 
@@ -53,8 +63,24 @@ class ApplicationBloc implements BlocBase {
     outFontFamily.listen(_handleChangeFont);
     outNewStyle.listen(_handleChangeNewStyle);
     outNightMode.listen(_handleChangeNightMode);
+    _addFavController.stream.listen(_handleAddFav);
+    _removeFavController.stream.listen(_handleRemoveFav);
     _loadInitialPrefs();
     _loadCanonsList();
+  }
+
+  _handleRemoveFav(value) async {
+    List<CsText> favs = await outFavs.first;
+    try {
+      favs.removeAt(value);
+      _inFavs.add(favs);
+    } catch (e) {}
+  }
+
+  _handleAddFav(value) async {
+    List<CsText> favs = await outFavs.first;
+    favs.add(value);
+    _inFavs.add(favs);
   }
 
   _handleChangeNightMode(value) async {
@@ -91,7 +117,8 @@ class ApplicationBloc implements BlocBase {
   Future<Null> _apiInfoDay() async {
     _infoPage = [];
     for (var i = 0; i < TEXTTYPE.values.length; i++) {
-      _infoPage.add(await DayTextService.getDayText(DateTime.now(), TEXTTYPE.values[i]));
+      _infoPage.add(
+          await DayTextService.getDayText(DateTime.now(), TEXTTYPE.values[i]));
     }
 
     _inInfoPage.add(UnmodifiableListView(_infoPage));

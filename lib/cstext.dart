@@ -12,6 +12,12 @@ class CsText extends StatefulWidget {
   CsText(this.text, this.controller,
       [this.textColor = Colors.black, this.rus = false]);
 
+  CsText copy() {
+    ScrollController sc =
+        ScrollController(initialScrollOffset: controller.offset);
+    return CsText(this.text, sc, this.textColor, this.rus);
+  }
+
   @override
   State<StatefulWidget> createState() => _CsText();
 }
@@ -30,10 +36,12 @@ class _CsText extends State<CsText> {
 
   _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _fontSize = prefs.getDouble("fontSize") ?? 2.0;
-      //_fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
-    });
+    if (this.mounted) {
+      setState(() {
+        _fontSize = prefs.getDouble("fontSize") ?? 2.0;
+        //_fontFamily = prefs.getString("fontFamily") ?? 'Grebnev';
+      });
+    }
   }
 
   _savePreferences(ScaleEndDetails _) async {
@@ -57,9 +65,11 @@ class _CsText extends State<CsText> {
         if (left.isNotEmpty && fn.length > 1) {
           toReturn.add(Text.rich(
             TextSpan(
-                style:
-                    TextStyle(color: widget.textColor, fontFamily: _fontFamily),
-                children: _parseRed(left)),
+              style:
+                  TextStyle(color: widget.textColor, fontFamily: _fontFamily),
+              children: _parseRed(left),
+            ),
+            style: TextStyle(fontFamily: _fontFamily),
             textAlign: TextAlign.center,
             textScaleFactor: _fontSize,
           ));
@@ -105,7 +115,7 @@ class _CsText extends State<CsText> {
           toReturn.add(TextSpan(
               text: red,
               style:
-                  TextStyle(color: Colors.red[800], fontFamily: _fontFamily)));
+                  TextStyle(color: Colors.red[800])));//, fontFamily: _fontFamily)));
         } else if (fn.length == 1) {
           toReturn.add(TextSpan(text: red));
         }
@@ -116,7 +126,7 @@ class _CsText extends State<CsText> {
             toReturn.add(TextSpan(
                 text: black,
                 style:
-                    TextStyle(color: Colors.black, fontFamily: _fontFamily)));
+                    TextStyle(color: Colors.black)));//, fontFamily: _fontFamily)));
           }
         }
       }
