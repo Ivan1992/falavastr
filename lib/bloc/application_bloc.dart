@@ -81,11 +81,17 @@ class ApplicationBloc implements BlocBase {
 
   _loadInitialFavs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String str = prefs.getString("favourites")??"[]";
-    List<String> json = jsonDecode(str);
+    String str = prefs.getString("favourites") ?? "[]";
+    List<CsText> json = [];
+    dynamic dyn = jsonDecode(str);
+    for (String s in dyn) {
+      Map ctMap = jsonDecode(s);
+      CsText ct = CsText.fromJson(ctMap);
+      json.add(ct);
+    }
+
     if (json.length > 0) {
-      List<CsText> favs = json.map((item) => CsText.fromJson(jsonDecode(item))).toList();
-      _inFavs.add(favs);
+      _inFavs.add(json);
     }
   }
 
@@ -93,7 +99,7 @@ class ApplicationBloc implements BlocBase {
     List<CsText> favs = await outFavs.first;
     favs.add(value);
     _inFavs.add(favs);
-    List<String> json = favs.map((item) => item.toJson().toString()).toList();
+    List<String> json = favs.map((item) => jsonEncode(item)).toList();
     String str = jsonEncode(json);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("favourites", str);

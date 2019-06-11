@@ -29,6 +29,7 @@ class _UstavPageState extends State<UstavPage> {
       ScrollController(initialScrollOffset: 0.0);
   Color backgroundColor = Colors.white;
   double _height = 0.5;
+  double _favSize = 0.5;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback _showBottomSheetCallback;
@@ -79,39 +80,28 @@ class _UstavPageState extends State<UstavPage> {
         // return object of type Dialog
         return AlertDialog(
           title: Text("Выберите часть"),
-          content: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.9,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Expanded(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: widget.day.sluzhby[_currentSluzhba].parts
-                        .map(
-                          (part) => part.text != null
-                              ? ListTile(
-                                  onTap: () {
-                                    setState(() {
-                                      controller.jumpTo(0.0);
-                                      _cstext = CsText(part.text, controller);
-                                      Navigator.of(context).pop();
-                                    });
-                                  },
-                                  title: Center(
-                                    child: Text(part.name),
-                                  ),
-                                )
-                              : Container(),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: widget.day.sluzhby[_currentSluzhba].parts
+                .map(
+                  (part) => part.text != null
+                      ? ListTile(
+                          onTap: () {
+                            setState(() {
+                              controller.jumpTo(0.0);
+                              _cstext = CsText(part.text, controller);
+                              Navigator.of(context).pop();
+                            });
+                          },
+                          title: Center(
+                            child: Text(part.name),
+                          ),
                         )
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
+                      : Container(),
+                )
+                .toList(),
           ),
         );
       },
@@ -175,6 +165,33 @@ class _UstavPageState extends State<UstavPage> {
     );
   }
 
+  PopupMenuItem<String> _createChangeFavSize(String text) {
+    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
+
+    return PopupMenuItem<String>(
+      value: text,
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text("Размер закладок"),
+            Slider(
+              onChanged: (val) {
+                setState(() {
+                  _favSize = val / 100;
+                });
+              },
+              value: _favSize * 100,
+              min: 10.0,
+              max: 100.0,
+              divisions: 5,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   List<PopupMenuEntry<String>> _buildMenu(BuildContext context) {
     return <PopupMenuEntry<String>>[
       _createNightMode("Ночная тема", true),
@@ -184,6 +201,7 @@ class _UstavPageState extends State<UstavPage> {
       _createFontTile('Turaevo', 'Тураево'),
       _createFontTile('Grebnev', 'Гребнев'),
       const PopupMenuDivider(),
+      _createChangeFavSize(""),
     ];
   }
 
@@ -291,7 +309,7 @@ class BSClass extends StatefulWidget {
   State<StatefulWidget> createState() => _BSClassState();
 }
 
-class _BSClassState extends State<BSClass> with TickerProviderStateMixin  {
+class _BSClassState extends State<BSClass> with TickerProviderStateMixin {
   double _height = 0.6;
   TabController _controller;
 
@@ -305,62 +323,66 @@ class _BSClassState extends State<BSClass> with TickerProviderStateMixin  {
           border:
               Border(top: BorderSide(color: widget.themeData.disabledColor))),
       child: StreamBuilder(
-            stream: appBloc.outFavs,
-            builder: (BuildContext ctx, AsyncSnapshot<List<CsText>> snapshot) {
-              if (!snapshot.hasData)
-                return Center(child: CircularProgressIndicator());
-              if (snapshot.data != null && snapshot.data.length == 0)
-                return Center(child: Text("нет закладок"));
+        stream: appBloc.outFavs,
+        builder: (BuildContext ctx, AsyncSnapshot<List<CsText>> snapshot) {
+          if (!snapshot.hasData)
+            return Center(child: CircularProgressIndicator());
+          if (snapshot.data != null && snapshot.data.length == 0)
+            return Center(child: Text("нет закладок"));
 
-              _controller =
-                  TabController(vsync: this, length: snapshot.data.length);
+          _controller =
+              TabController(vsync: this, length: snapshot.data.length);
 
-              List<Tab> tabHeader = [];
-              for (int i = 0; i < snapshot.data.length; i++) {
-                tabHeader.add(Tab(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text("закладка ${i + 1}", style: TextStyle(height: 1.0)),
-                      IconButton(
-                        onPressed: () {
-                          appBloc.removeFav.add(i);
-                          /* snapshot.data.removeAt(i);
+          List<Tab> tabHeader = [];
+          for (int i = 0; i < snapshot.data.length; i++) {
+            tabHeader.add(Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("закладка ${i + 1}", style: TextStyle(height: 1.0)),
+                  IconButton(
+                    onPressed: () {
+                      appBloc.removeFav.add(i);
+                      if (snapshot.data.length > 1) {
+                        _controller = TabController(
+                            vsync: this, length: snapshot.data.length - 1);
+                      }
+                      /* snapshot.data.removeAt(i);
                           setState((){}); */
-                        },
-                        icon: Icon(Icons.close),
-                      )
-                    ],
-                  ),
-                ));
-              }
+                    },
+                    icon: Icon(Icons.close),
+                  )
+                ],
+              ),
+            ));
+          }
 
-              return Container(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      /* height: 10, */
-                      child: TabBar(
-                        controller: _controller,
-                        isScrollable: true,
-                        tabs: tabHeader,
-                      ),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _controller,
-                        children: snapshot.data
-                            .map((item) => Container(
-                                color: widget.backgroundColor, child: item))
-                            .toList(),
-                      ),
-                    ),
-                  ],
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  /* height: 10, */
+                  child: TabBar(
+                    controller: _controller,
+                    isScrollable: true,
+                    tabs: tabHeader,
+                  ),
                 ),
-              );
-            },
-          ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _controller,
+                    children: snapshot.data
+                        .map((item) => Container(
+                            color: widget.backgroundColor, child: item))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
       /* Column(
         children: [
           Container(
