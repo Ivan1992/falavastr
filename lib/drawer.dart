@@ -10,6 +10,9 @@ import 'package:falavastr/pages/ustav.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'bloc/library_bloc.dart';
+import 'pages/library/detailsPage.dart';
+
 class DrawerOnly extends StatelessWidget {
   final bool expanded;
   final DateTime _today = DateTime.now();
@@ -64,6 +67,33 @@ class DrawerOnly extends StatelessWidget {
     );
   }
 
+  ListTile _getLibraryTile(BuildContext context, String title, BOOKTYPE type) {
+    return ListTile(
+      leading: Icon(Icons.subdirectory_arrow_right),
+      title: Padding(
+        padding: EdgeInsets.only(left: 10.0),
+        child: Text(
+          title,
+          style:
+              TextStyle(color: Theme.of(context).primaryTextTheme.title.color),
+        ),
+      ),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<Null>(
+            builder: (BuildContext context) {
+              return BlocProvider<LibraryBloc>(
+                bloc: LibraryBloc(),
+                child: DetailsPage(type: type),
+              );
+              //return DetailsPage(type: 0);
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext ctxt) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(ctxt);
@@ -85,22 +115,37 @@ class DrawerOnly extends StatelessWidget {
                 )),
               ),
               ExpansionTile(
-                  initiallyExpanded: expanded,
-                  leading: Icon(Icons.bookmark),
-                  title: Text(
-                    "Устав на сегодня",
-                    style: TextStyle(
-                        color: Theme.of(ctxt).primaryTextTheme.title.color),
-                  ),
-                  children: snapshot.hasData
-                      ? snapshot.data
-                          .where((x) => x != null)
-                          .map((x) => _getTile(ctxt, x.title, x,
-                              Icon(Icons.subdirectory_arrow_right), 10.0))
-                          .toList()
-                      : <Widget>[Center(child: CircularProgressIndicator())]),
-              _getDummy(ctxt, "Библиотека", Icon(Icons.library_books), 0.0,
-                  null, LibraryPage()), //stars
+                initiallyExpanded: expanded,
+                leading: Icon(Icons.bookmark),
+                title: Text(
+                  "Устав на сегодня",
+                  style: TextStyle(
+                      color: Theme.of(ctxt).primaryTextTheme.title.color),
+                ),
+                children: snapshot.hasData
+                    ? snapshot.data
+                        .where((x) => x != null)
+                        .map((x) => _getTile(ctxt, x.title, x,
+                            Icon(Icons.subdirectory_arrow_right), 10.0))
+                        .toList()
+                    : <Widget>[Center(child: CircularProgressIndicator())],
+              ),
+              ExpansionTile(
+                leading: Icon(Icons.library_books),
+                title: Text(
+                  "Библиотека",
+                  style: TextStyle(
+                      color: Theme.of(ctxt).primaryTextTheme.title.color),
+                ),
+                children: <Widget>[
+                  _getLibraryTile(ctxt, "Апостол", BOOKTYPE.APOSTOL),
+                  _getLibraryTile(ctxt, "Евангелие", BOOKTYPE.EVANGELIE),
+                  _getLibraryTile(ctxt, "Псалтырь", BOOKTYPE.PSALMS),
+                  _getLibraryTile(ctxt, "Часослов", BOOKTYPE.CHASOSLOV),
+                ],
+              ),
+              /* _getDummy(ctxt, "Библиотека", Icon(Icons.library_books), 0.0,
+                  null, LibraryPage()), */
               _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted), 0.0,
                   null, CanonPage()),
               _getDummy(ctxt, "Новости РПСЦ", Icon(Icons.rss_feed), 0.0, null,

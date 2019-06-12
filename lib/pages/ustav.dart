@@ -6,6 +6,7 @@ import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/cstext.dart';
 import 'package:falavastr/drawer.dart';
 import 'package:falavastr/pages/infopage.dart';
+import 'package:falavastr/pages/ustav_utilities.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -28,8 +29,6 @@ class _UstavPageState extends State<UstavPage> {
   final ScrollController controller =
       ScrollController(initialScrollOffset: 0.0);
   Color backgroundColor = Colors.white;
-  double _height = 0.5;
-  double _favSize = 0.5;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback _showBottomSheetCallback;
@@ -91,7 +90,7 @@ class _UstavPageState extends State<UstavPage> {
                           onTap: () {
                             setState(() {
                               controller.jumpTo(0.0);
-                              _cstext = CsText(part.text, controller);
+                              _cstext = CsText(part.text, controller, _cstext.textColor);
                               Navigator.of(context).pop();
                             });
                           },
@@ -108,101 +107,13 @@ class _UstavPageState extends State<UstavPage> {
     );
   }
 
-  void _changeFont(String value) {
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-    appBloc.inFontFamily.add(value);
-  }
 
-  void _changeNightMode(bool value) {
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-    appBloc.inNightMode.add(value);
-  }
-
-  PopupMenuItem<String> _createFontTile(String name, String label) {
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-
-    return PopupMenuItem<String>(
-      value: name,
-      child: StreamBuilder(
-          stream: appBloc.outFontFamily,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            bool selected = snapshot.hasData ? (snapshot.data == name) : false;
-            return ListTile(
-              onTap: () => _changeFont(name),
-              leading: Icon(Icons.text_format),
-              title: Text(label, style: TextStyle(fontFamily: name)),
-              trailing: selected ? Icon(Icons.check) : null,
-            );
-          }),
-    );
-  }
-
-  PopupMenuItem<String> _createNightMode(String text, bool value) {
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-
-    return PopupMenuItem<String>(
-      value: text,
-      child: ListTile(
-        leading: Icon(Icons.format_color_fill),
-        title: Text(text),
-        onTap: () {
-          _changeNightMode(value);
-          setState(() {
-            backgroundColor = value ? Colors.blueGrey[900] : Colors.white;
-            _cstext = CsText(_cstext.text, _cstext.controller,
-                value ? Colors.yellow[200] : Colors.black);
-          });
-        },
-        trailing: StreamBuilder(
-          stream: appBloc.outNightMode,
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            return (snapshot.hasData && (snapshot.data == value))
-                ? Icon(Icons.check)
-                : Container(width: 0.0, height: 0.0);
-          },
-        ),
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _createChangeFavSize(String text) {
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-
-    return PopupMenuItem<String>(
-      value: text,
-      child: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text("Размер закладок"),
-            Slider(
-              onChanged: (val) {
-                setState(() {
-                  _favSize = val / 100;
-                });
-              },
-              value: _favSize * 100,
-              min: 10.0,
-              max: 100.0,
-              divisions: 5,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<PopupMenuEntry<String>> _buildMenu(BuildContext context) {
-    return <PopupMenuEntry<String>>[
-      _createNightMode("Ночная тема", true),
-      _createNightMode("Дневная тема", false),
-      const PopupMenuDivider(),
-      _createFontTile('Orthodox', 'Ортодокс'),
-      _createFontTile('Turaevo', 'Тураево'),
-      _createFontTile('Grebnev', 'Гребнев'),
-      const PopupMenuDivider(),
-      _createChangeFavSize(""),
-    ];
+  void updateCsText(bool value) {
+    setState(() {
+      backgroundColor = value ? Colors.blueGrey[900] : Colors.white;
+      _cstext = CsText(_cstext.text, _cstext.controller,
+          value ? Colors.brown[100] : Colors.black);
+    });
   }
 
   @override
@@ -214,9 +125,7 @@ class _UstavPageState extends State<UstavPage> {
         child: Icon(Icons.menu),
       );
     }
-
-    final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
-
+    
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -233,12 +142,8 @@ class _UstavPageState extends State<UstavPage> {
                       .copyWith(fontSize: 20.0),
                 ),
                 actions: <Widget>[
-                  PopupMenuButton<String>(
-                    icon: Icon(Icons.format_size),
-                    padding: EdgeInsets.zero,
-                    onSelected: showMenuSelection,
-                    itemBuilder: _buildMenu,
-                  ),
+                  PopupListBuilder(
+                      updateCsText: updateCsText, context: context),
                   IconButton(
                     onPressed: () {
                       setState(() {
@@ -317,86 +222,85 @@ class _BSClassState extends State<BSClass> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
 
-    return Container(
-      height: MediaQuery.of(context).size.height * _height,
-      decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: widget.themeData.disabledColor))),
-      child: StreamBuilder(
-        stream: appBloc.outFavs,
-        builder: (BuildContext ctx, AsyncSnapshot<List<CsText>> snapshot) {
-          if (!snapshot.hasData)
-            return Center(child: CircularProgressIndicator());
-          if (snapshot.data != null && snapshot.data.length == 0)
-            return Center(child: Text("нет закладок"));
+    return StreamBuilder(
+      stream: appBloc.outFavSize,
+      builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+        if (!snapshot.hasData) return Container();
+        return Container(
+          height: MediaQuery.of(context).size.height * snapshot.data,
+          decoration: BoxDecoration(
+              border: Border(
+                  top: BorderSide(color: widget.themeData.disabledColor))),
+          child: StreamBuilder(
+            stream: appBloc.outFavs,
+            builder: (BuildContext ctx, AsyncSnapshot<List<CsText>> snapshot) {
+              if (!snapshot.hasData)
+                return Center(child: CircularProgressIndicator());
+              if (snapshot.data != null && snapshot.data.length == 0)
+                return Center(child: Text("нет закладок"));
 
-          _controller =
-              TabController(vsync: this, length: snapshot.data.length);
+              _controller =
+                  TabController(vsync: this, length: snapshot.data.length);
 
-          List<Tab> tabHeader = [];
-          for (int i = 0; i < snapshot.data.length; i++) {
-            tabHeader.add(Tab(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("закладка ${i + 1}", style: TextStyle(height: 1.0)),
-                  IconButton(
-                    onPressed: () {
-                      appBloc.removeFav.add(i);
-                      if (snapshot.data.length > 1) {
-                        _controller = TabController(
-                            vsync: this, length: snapshot.data.length - 1);
-                      }
-                      /* snapshot.data.removeAt(i);
+              List<Tab> tabHeader = [];
+              for (int i = 0; i < snapshot.data.length; i++) {
+                tabHeader.add(Tab(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("закладка ${i + 1}", style: TextStyle(height: 1.0)),
+                      IconButton(
+                        onPressed: () {
+                          appBloc.removeFav.add(i);
+                          if (snapshot.data.length > 1) {
+                            _controller = TabController(
+                                vsync: this, length: snapshot.data.length - 1);
+                          }
+                          /* snapshot.data.removeAt(i);
                           setState((){}); */
-                    },
-                    icon: Icon(Icons.close),
-                  )
-                ],
-              ),
-            ));
-          }
+                        },
+                        icon: Icon(Icons.close),
+                      )
+                    ],
+                  ),
+                ));
+              }
 
-          return Container(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  /* height: 10, */
-                  child: TabBar(
-                    controller: _controller,
-                    isScrollable: true,
-                    tabs: tabHeader,
-                  ),
+              return Container(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      /* height: 10, */
+                      child: TabBar(
+                        controller: _controller,
+                        isScrollable: true,
+                        tabs: tabHeader,
+                      ),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _controller,
+                        children: snapshot.data
+                            .map((item) => Container(
+                                color: widget.backgroundColor, child: item))
+                            .toList(),
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _controller,
-                    children: snapshot.data
-                        .map((item) => Container(
-                            color: widget.backgroundColor, child: item))
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-      /* Column(
-        children: [
-          Container(
-            height: 30.0,
-            child: Icon(Icons.menu),
+              );
+            },
           ),
-        ],
-      ), */
+        );
+      },
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_controller != null)
+      _controller.dispose();
     super.dispose();
   }
 }

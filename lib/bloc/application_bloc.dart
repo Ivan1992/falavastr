@@ -57,6 +57,14 @@ class ApplicationBloc implements BlocBase {
   Stream<bool> get outNightMode => _nightModeController.stream;
   StreamSink<bool> get inNightMode => _nightModeController.sink;
 
+  BehaviorSubject<double> _favSizeController = BehaviorSubject<double>(seedValue: 0.5);
+  Stream<double> get outFavSize => _favSizeController.stream;
+  StreamSink<double> get inFavSize => _favSizeController.sink;
+
+  BehaviorSubject<double> _fontSizeController = BehaviorSubject<double>(seedValue: 2.0);
+  Stream<double> get outFontSize => _fontSizeController.stream;
+  StreamSink<double> get inFontSize => _fontSizeController.sink;
+
   ApplicationBloc() {
     _apiInfoDay();
     _changeDateController.stream.listen(_handeChangeDate);
@@ -66,9 +74,21 @@ class ApplicationBloc implements BlocBase {
     outNightMode.listen(_handleChangeNightMode);
     _addFavController.stream.listen(_handleAddFav);
     _removeFavController.stream.listen(_handleRemoveFav);
+    outFavSize.listen(_handleChangeSize);
+    outFontSize.listen(_handleChangeFontSize);
     _loadInitialPrefs();
     _loadCanonsList();
     _loadInitialFavs();
+  }
+
+  _handleChangeFontSize(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("fontSize", value);
+  }
+
+  _handleChangeSize(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("favSize", value);
   }
 
   _handleRemoveFav(value) async {
@@ -93,6 +113,9 @@ class ApplicationBloc implements BlocBase {
     if (json.length > 0) {
       _inFavs.add(json);
     }
+    
+    double size = prefs.getDouble("favSize") ?? 0.5;
+    inFavSize.add(size);
   }
 
   _handleAddFav(value) async {
@@ -125,6 +148,7 @@ class ApplicationBloc implements BlocBase {
     inFontFamily.add(prefs.getString("fontFamily") ?? 'Grebnev');
     inNewStyle.add(prefs.getBool("newStyle") ?? true);
     inNightMode.add(prefs.getBool("nightMode") ?? false);
+    inFontSize.add(prefs.getDouble("fontSize") ?? 2.0);
   }
 
   _loadCanonsList() async {
@@ -166,5 +190,7 @@ class ApplicationBloc implements BlocBase {
     _favController.close();
     _addFavController.close();
     _removeFavController.close();
+    _favSizeController.close();
+    _fontSizeController.close();
   }
 }

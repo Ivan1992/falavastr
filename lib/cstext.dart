@@ -138,7 +138,7 @@ class _CsText extends State<CsText> {
             toReturn.add(TextSpan(
                 text: black,
                 style: TextStyle(
-                    color: Colors.black))); //, fontFamily: _fontFamily)));
+                    color: widget.textColor))); //, fontFamily: _fontFamily)));
           }
         }
       }
@@ -164,29 +164,30 @@ class _CsText extends State<CsText> {
     final ApplicationBloc appBloc = BlocProvider.of<ApplicationBloc>(context);
 
     return GestureDetector(
-        onScaleStart: _handleOnScaleStart,
-        onScaleUpdate: _handleScaleUpdate,
-        onScaleEnd: _savePreferences,
-        child: StreamBuilder(
-          stream: appBloc.outFontFamily,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            _fontFamily = snapshot.hasData ? snapshot.data : 'Grebnev';
-            return DraggableScrollbar.semicircle(
-              backgroundColor: Theme.of(context).primaryColor,
-              child: ListView(
-                controller: widget.controller,
-                padding: EdgeInsets.all(10.0),
-                children: _parseText(widget.text),
-              ),
-              controller: widget.controller,
-            );
-          },
-        )
-        /* child: ListView(
-        controller: _controller,
-        padding: EdgeInsets.all( 10.0),
-        children: _parseText(widget.text),
-      ), */
-        );
+      onScaleStart: _handleOnScaleStart,
+      onScaleUpdate: _handleScaleUpdate,
+      onScaleEnd: _savePreferences,
+      child: StreamBuilder(
+        stream: appBloc.outFontFamily,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          _fontFamily = snapshot.hasData ? snapshot.data : 'Grebnev';
+
+          return StreamBuilder(
+              stream: appBloc.outFontSize,
+              builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+                _fontSize = snapshot.hasData ? snapshot.data : 2.0;
+                return DraggableScrollbar.semicircle(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  child: ListView(
+                    controller: widget.controller,
+                    padding: EdgeInsets.all(10.0),
+                    children: _parseText(widget.text),
+                  ),
+                  controller: widget.controller,
+                );
+              });
+        },
+      ),
+    );
   }
 }
