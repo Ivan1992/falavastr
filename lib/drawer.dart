@@ -2,8 +2,8 @@ import 'package:falavastr/bloc/application_bloc.dart';
 import 'package:falavastr/bloc/bloc_provider.dart';
 import 'package:falavastr/calendar/DayText.dart';
 import 'package:falavastr/pages/aboutPage.dart';
+import 'package:falavastr/pages/calendarPage.dart';
 import 'package:falavastr/pages/canonPage.dart';
-import 'package:falavastr/pages/libraryPage.dart';
 import 'package:falavastr/pages/rss/rssfeed.dart';
 import 'package:falavastr/pages/settingsPage.dart';
 import 'package:falavastr/pages/ustav.dart';
@@ -15,7 +15,6 @@ import 'pages/library/detailsPage.dart';
 
 class DrawerOnly extends StatelessWidget {
   final bool expanded;
-  final DateTime _today = DateTime.now();
 
   DrawerOnly([this.expanded = false]) {
     initializeDateFormatting("ru");
@@ -114,6 +113,7 @@ class DrawerOnly extends StatelessWidget {
                   ),
                 )),
               ),
+              _getDummy(ctxt, "Календарь", Icon(Icons.calendar_today), 0.0, null, CalendarPage()),
               ExpansionTile(
                 initiallyExpanded: expanded,
                 leading: Icon(Icons.bookmark),
@@ -146,8 +146,7 @@ class DrawerOnly extends StatelessWidget {
               ),
               /* _getDummy(ctxt, "Библиотека", Icon(Icons.library_books), 0.0,
                   null, LibraryPage()), */
-              _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted), 0.0,
-                  null, CanonPage()),
+              _getDummy(ctxt, "Канонник", Icon(Icons.format_list_bulleted), 0.0, null, CanonPage()),
               _getDummy(ctxt, "Новости РПСЦ", Icon(Icons.rss_feed), 0.0, null,
                   RSSFeed()),
               _getDummy(ctxt, "Настройки", Icon(Icons.settings), 0.0, null,
